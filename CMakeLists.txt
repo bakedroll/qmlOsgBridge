@@ -32,5 +32,6 @@ if (MSVC)
   qt_copy_qml_binaries(
     QtQuick/Window.2/windowplugin
     QtQuick/Controls.2/qtquickcontrols2plugin
+    QtQuick/Templates.2/qtquicktemplates2plugin
     QtQuick.2/qtquick2plugin)
 endif()

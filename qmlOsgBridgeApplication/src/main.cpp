@@ -1,16 +1,9 @@
-#include <QGuiApplication>
-#include <QQmlApplicationEngine>
-#include <QQuickStyle>
+#include "Application.h"
+#include "MainContext.h"
+#include "MainState.h"
 
 int main(int argc, char** argv)
 {
-  //QCoreApplication::setAttribute(Qt::AA_UseSoftwareOpenGL);
-  QGuiApplication app(argc, argv);
-
-  QQuickStyle::setStyle("Fusion");
-
-  QQmlApplicationEngine engine;
-  engine.load(QUrl(QStringLiteral("qrc:/resources/mainwindow.qml")));
-
-  return app.exec();
+  Application app(argc, argv);
+  return app.runGame<MainState, MainContext>("qrc:/resources/mainwindow.qml");
 }
