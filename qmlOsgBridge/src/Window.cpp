@@ -7,7 +7,7 @@
 namespace qmlOsgBridge
 {
 
-static constexpr int c_minFrameTimeNs = 16666667; // 16 ms per frame
+static constexpr int c_minFrameTimeNs = 16; // 16 ms per frame
 
 Window::Window(QQuickWindow* quickWindow) :
   QObject(quickWindow),
@@ -19,7 +19,7 @@ Window::Window(QQuickWindow* quickWindow) :
 {
   connect(this, &Window::triggerDispatchRenderThread, m_renderWorker.get(), &RenderWorker::dispatch, Qt::QueuedConnection);
   connect(this, &Window::triggerDispatchRenderThreadBlocking, m_renderWorker.get(), &RenderWorker::dispatch, Qt::BlockingQueuedConnection);
-  connect(this, &Window::textureInUse, m_renderWorker.get(), &RenderWorker::renderNext, Qt::QueuedConnection);
+  connect(this, &Window::textureInUse, m_renderWorker.get(), &RenderWorker::render, Qt::QueuedConnection);
 
   connect(m_renderWorker.get(), &RenderWorker::textureReady, this, &Window::newTexture, Qt::QueuedConnection);
   connect(m_renderWorker.get(), &RenderWorker::textureReady, m_quickWindow, &QQuickWindow::update, Qt::QueuedConnection);
@@ -137,7 +137,7 @@ void Window::ready()
 
   m_renderThread->start();
 
-  QMetaObject::invokeMethod(m_renderWorker.get(), &RenderWorker::renderNext, Qt::QueuedConnection);
+  QMetaObject::invokeMethod(m_renderWorker.get(), &RenderWorker::render, Qt::QueuedConnection);
 }
 
 void Window::newTexture()
