@@ -27,7 +27,6 @@ public:
 
   virtual void setContextWindow(IWindow* window) = 0;
 
-
 };
 
 }

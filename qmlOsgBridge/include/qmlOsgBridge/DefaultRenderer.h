@@ -16,8 +16,8 @@ public:
   ~DefaultRenderer() override;
 
   osg::ref_ptr<osgHelper::View> getView() const override;
-  virtual QPointer<QQuickWindow> getQuickWindow() const override;
-  virtual void dispatchRenderThread(const std::function<void()>& func) const override;
+  QPointer<QQuickWindow> getQuickWindow() const override;
+  void dispatchRenderThread(const std::function<void()>& func) const override;
   void moveObjectToRenderThread(const QPointer<QObject>& obj) const override;
 
   void setContextWindow(IWindow* window) override;

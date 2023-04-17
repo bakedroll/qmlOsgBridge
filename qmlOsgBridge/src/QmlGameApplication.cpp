@@ -29,6 +29,8 @@ QmlGameApplication::QmlGameApplication(int& argc, char** argv) :
 
   qmlRegisterType<qmlOsgBridge::OSGViewport>(s_qmlUri, s_majorVersion, s_minorVersion, "OSGViewport");
   qRegisterMetaType<QPointer<IRenderer>>("QPointer<IRenderer>");
+
+  connect(&m_qmlEngine, &QQmlEngine::warnings, this, &QmlGameApplication::receiveWarnings, Qt::DirectConnection);
 }
 
 QmlGameApplication::~QmlGameApplication()
@@ -101,6 +103,11 @@ bool QmlGameApplication::notify(QObject* receiver, QEvent* event)
   }
 
   return false;
+}
+
+void QmlGameApplication::receiveWarnings(const QList<QQmlError>& warnings)
+{
+  m_warnings = warnings;
 }
 
 }

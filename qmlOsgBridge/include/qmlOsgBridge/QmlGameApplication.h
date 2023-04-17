@@ -32,7 +32,7 @@ public:
     }
 
     m_qmlEngine.load(QUrl(rootQmlFilename));
-    if (!injectPushAndPrepareState<TState>())
+    if (!m_warnings.empty() || !injectPushAndPrepareState<TState>())
     {
       return -1;
     }
@@ -54,6 +54,9 @@ protected:
 
   bool notify(QObject *receiver, QEvent *event) override;
 
+private Q_SLOTS:
+  void receiveWarnings(const QList<QQmlError>& warnings);
+
 private:
   static const char* s_qmlUri;
   static const char* s_contextName;
@@ -62,6 +65,8 @@ private:
 
   QQmlApplicationEngine m_qmlEngine;
   osg::ref_ptr<IQmlContext> m_qmlContext;
+
+  QList<QQmlError> m_warnings;
 
   template <typename TContext>
   bool injectAndRegisterContext()
