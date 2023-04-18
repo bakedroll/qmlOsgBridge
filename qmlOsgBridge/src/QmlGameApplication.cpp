@@ -105,9 +105,23 @@ bool QmlGameApplication::notify(QObject* receiver, QEvent* event)
   return false;
 }
 
+std::vector<QString> QmlGameApplication::qmlImportPaths() const
+{
+  return {};
+}
+
 void QmlGameApplication::receiveWarnings(const QList<QQmlError>& warnings)
 {
   m_warnings = warnings;
+}
+
+void QmlGameApplication::addQmlImportPaths()
+{
+  const auto paths = qmlImportPaths();
+  for (const auto& path: paths)
+  {
+    m_qmlEngine.addImportPath(path);
+  }
 }
 
 }

@@ -31,6 +31,7 @@ public:
       return -1;
     }
 
+    addQmlImportPaths();
     m_qmlEngine.load(QUrl(rootQmlFilename));
     if (!m_warnings.empty() || !injectPushAndPrepareState<TState>())
     {
@@ -53,6 +54,8 @@ protected:
   void quitApp() override;
 
   bool notify(QObject *receiver, QEvent *event) override;
+
+  virtual std::vector<QString> qmlImportPaths() const;
 
 private Q_SLOTS:
   void receiveWarnings(const QList<QQmlError>& warnings);
@@ -80,6 +83,8 @@ private:
       s_qmlUri, s_majorVersion, s_minorVersion, s_contextName, context.get());
     return true;
   }
+
+  void addQmlImportPaths();
 
 };
 
