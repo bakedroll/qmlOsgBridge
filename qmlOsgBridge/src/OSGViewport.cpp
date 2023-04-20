@@ -17,6 +17,9 @@ OSGViewport::OSGViewport(QQuickItem* parent) :
   m_needPrepareNodesUpdate(false)
 {
   m_format.setAttachment(QOpenGLFramebufferObject::CombinedDepthStencil);
+
+  forceActiveFocus();
+  setAcceptHoverEvents(true);
 }
 
 OSGViewport::~OSGViewport()
@@ -80,6 +83,23 @@ void OSGViewport::deleteFrameBufferObjects()
   m_displayFbo.reset();
 }
 
+void OSGViewport::installEventFilter(QObject* eventFilter)
+{
+  if (std::find(m_eventFilters.begin(), m_eventFilters.end(), eventFilter) != m_eventFilters.end())
+  {
+    return;
+  }
+
+  QQuickItem::installEventFilter(eventFilter);
+  m_eventFilters.emplace_back(eventFilter);
+}
+
+void OSGViewport::removeEventFilter(QObject* eventFilter)
+{
+  QQuickItem::removeEventFilter(eventFilter);
+  static_cast<void>(std::remove(m_eventFilters.begin(), m_eventFilters.end(), eventFilter));
+}
+
 osg::ref_ptr<osgViewer::View> OSGViewport::getView() const
 {
   return m_renderer->getView();
@@ -99,6 +119,7 @@ void OSGViewport::setRenderer(const QPointer<IRenderer>& renderer)
 
   m_renderer = renderer;
   m_renderer->setContextWindow(m_window);
+  m_renderer->setOSGViewport(this);
 
   const auto preDrawCallback = new DrawCallbackFunc(std::bind(&OSGViewport::preDrawFunction, this));
   const auto postDrawCallback = new DrawCallbackFunc(std::bind(&OSGViewport::postDrawFunction, this));
@@ -155,6 +176,21 @@ void OSGViewport::itemChange(QQuickItem::ItemChange change, const QQuickItem::It
     acceptWindow(Window::fromQuickWindow(value.window));
   }
   QQuickItem::itemChange(change, value);
+}
+
+void OSGViewport::mousePressEvent(QMouseEvent* event)
+{
+}
+
+void OSGViewport::hoverMoveEvent(QHoverEvent* event)
+{
+  QMouseEvent mouseEvent(QEvent::MouseMove, event->pos(),
+    Qt::MouseButton::NoButton, Qt::MouseButton::NoButton, Qt::KeyboardModifier::NoModifier);
+
+  for (const auto& filter : m_eventFilters)
+  {
+    filter->eventFilter(this, &mouseEvent);
+  }
 }
 
 void OSGViewport::preDrawFunction()

@@ -10,6 +10,7 @@
 namespace qmlOsgBridge
 {
 
+class IOSGViewport;
 class IWindow;
 
 class IRenderer : public QObject
@@ -22,10 +23,13 @@ public:
 
   virtual osg::ref_ptr<osgHelper::View> getView() const = 0;
   virtual QPointer<QQuickWindow> getQuickWindow() const = 0;
+  virtual IOSGViewport* getOSGViewport() const = 0;
+
   virtual void dispatchRenderThread(const std::function<void()>& func) const = 0;
   virtual void moveObjectToRenderThread(const QPointer<QObject>& obj) const = 0;
 
   virtual void setContextWindow(IWindow* window) = 0;
+  virtual void setOSGViewport(IOSGViewport* viewport) = 0;
 
 };
 

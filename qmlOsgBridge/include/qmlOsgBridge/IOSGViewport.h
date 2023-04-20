@@ -2,6 +2,9 @@
 
 #include <osgViewer/View>
 
+#include <QObject>
+#include <QPointer>
+
 namespace qmlOsgBridge
 {
 
@@ -12,6 +15,9 @@ public:
 
   virtual void prepareNode() = 0;
   virtual void deleteFrameBufferObjects() = 0;
+
+  virtual void installEventFilter(QObject* eventFilter) = 0;
+  virtual void removeEventFilter(QObject* eventFilter) = 0;
 
   virtual osg::ref_ptr<osgViewer::View> getView() const = 0;
 

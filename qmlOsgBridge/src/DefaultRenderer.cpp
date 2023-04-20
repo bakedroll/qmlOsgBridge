@@ -27,6 +27,11 @@ QPointer<QQuickWindow> DefaultRenderer::getQuickWindow() const
   return m_window->getQuickWindow();
 }
 
+IOSGViewport* DefaultRenderer::getOSGViewport() const
+{
+  return m_viewport;
+}
+
 void DefaultRenderer::dispatchRenderThread(const std::function<void()>& func) const
 {
   if (!m_window)
@@ -45,6 +50,11 @@ void DefaultRenderer::moveObjectToRenderThread(const QPointer<QObject>& obj) con
 void DefaultRenderer::setContextWindow(IWindow* window)
 {
   m_window = window;
+}
+
+void DefaultRenderer::setOSGViewport(IOSGViewport* viewport)
+{
+  m_viewport = viewport;
 }
 
 }

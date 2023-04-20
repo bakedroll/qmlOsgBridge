@@ -35,6 +35,9 @@ public:
   void prepareNode() override;
   void deleteFrameBufferObjects() override;
 
+  virtual void installEventFilter(QObject* eventFilter) override;
+  virtual void removeEventFilter(QObject* eventFilter) override;
+
   osg::ref_ptr<osgViewer::View> getView() const override;
 
   QPointer<IRenderer> renderer() const;
@@ -44,6 +47,9 @@ protected:
   QSGNode* updatePaintNode(QSGNode* oldNode, QQuickItem::UpdatePaintNodeData* updatePaintNodeData) override;
   void geometryChanged(const QRectF& newGeometry, const QRectF& oldGeometry) override;
   void itemChange(QQuickItem::ItemChange change, const QQuickItem::ItemChangeData& value) override;
+
+  void mousePressEvent(QMouseEvent* event) override;
+  void hoverMoveEvent(QHoverEvent* event) override;
 
 private:
   IWindow* m_window;
@@ -63,6 +69,7 @@ private:
   QSize m_renderSize;
 
   bool m_needPrepareNodesUpdate;
+  std::vector<QPointer<QObject>> m_eventFilters;
 
   void preDrawFunction();
   void postDrawFunction();
