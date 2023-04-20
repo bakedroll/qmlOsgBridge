@@ -53,7 +53,7 @@ void QmlGameApplication::onPrepareGameState(const osg::ref_ptr<libQtGame::Abstra
   if (eventState)
   {
     m_qmlContext->getMainRenderer()->moveObjectToRenderThread(eventState);
-    m_qmlContext->getMainRenderer()->getOSGViewport()->installEventFilter(&eventState->eventHandler());
+    m_qmlContext->getMainRenderer()->getViewportItem()->installEventFilter(&eventState->eventHandler());
 
     eventState->onInitialize(m_qmlContext->getMainRenderer(), simData);
   }
@@ -66,7 +66,7 @@ void QmlGameApplication::onExitGameState(const osg::ref_ptr<libQtGame::AbstractG
   auto* eventState = dynamic_cast<EventProcessingState*>(state.get());
   if (eventState)
   {
-    m_qmlContext->getMainRenderer()->getOSGViewport()->removeEventFilter(&eventState->eventHandler());
+    m_qmlContext->getMainRenderer()->getViewportItem()->removeEventFilter(&eventState->eventHandler());
   }
 
   m_qmlContext->onGameStateAction(state, IQmlContext::ActionType::Exit);

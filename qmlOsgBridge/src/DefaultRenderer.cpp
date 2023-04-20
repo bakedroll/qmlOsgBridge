@@ -27,7 +27,7 @@ QPointer<QQuickWindow> DefaultRenderer::getQuickWindow() const
   return m_window->getQuickWindow();
 }
 
-IOSGViewport* DefaultRenderer::getOSGViewport() const
+QPointer<QQuickItem> DefaultRenderer::getViewportItem() const
 {
   return m_viewport;
 }
@@ -52,7 +52,7 @@ void DefaultRenderer::setContextWindow(IWindow* window)
   m_window = window;
 }
 
-void DefaultRenderer::setOSGViewport(IOSGViewport* viewport)
+void DefaultRenderer::setViewportItem(const QPointer<QQuickItem>& viewport)
 {
   m_viewport = viewport;
 }
