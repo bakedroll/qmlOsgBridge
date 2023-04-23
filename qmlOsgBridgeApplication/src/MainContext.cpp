@@ -24,12 +24,12 @@ void MainContext::onGameStateAction(const osg::ref_ptr<libQtGame::AbstractGameSt
 
 void MainContext::onToggleHDR()
 {
-  m_renderer->dispatchRenderThread([this]()
+  /*m_renderer->dispatchRenderThread([this]()
   {
     const auto view = m_renderer->getView();
     const auto isEnabled = view->getPostProcessingEffectEnabled(osgHelper::ppu::HDR::Name);
     view->setPostProcessingEffectEnabled(osgHelper::ppu::HDR::Name, !isEnabled);
-  });
+  });*/
 }
 
 void MainContext::onToggleFullscreen()

@@ -23,9 +23,9 @@ QmlGameApplication::QmlGameApplication(int& argc, char** argv) :
   MultithreadedApplication<QGuiApplication>(argc, argv),
   GameStatesApplication()
 {
-  auto format = QSurfaceFormat::defaultFormat();
-  format.setSwapInterval(0);
-  QSurfaceFormat::setDefaultFormat(format);
+  /*auto format = QSurfaceFormat::defaultFormat();
+  format.setSwapInterval(1);
+  QSurfaceFormat::setDefaultFormat(format);*/
 
   qmlRegisterType<qmlOsgBridge::OSGViewport>(s_qmlUri, s_majorVersion, s_minorVersion, "OSGViewport");
   qRegisterMetaType<QPointer<IRenderer>>("QPointer<IRenderer>");
@@ -43,7 +43,8 @@ QmlGameApplication::~QmlGameApplication()
 
 void QmlGameApplication::onInitialize(const osg::ref_ptr<libQtGame::GameUpdateCallback>& updateCallback)
 {
-  m_qmlContext->getMainRenderer()->getView()->getSceneData()->addUpdateCallback(updateCallback);
+  // TODO:
+  // m_qmlContext->getMainRenderer()->getView()->getSceneData()->addUpdateCallback(updateCallback);
 }
 
 void QmlGameApplication::onPrepareGameState(const osg::ref_ptr<libQtGame::AbstractGameState>& state,
@@ -82,7 +83,8 @@ void QmlGameApplication::onEmptyStateList()
 
 void QmlGameApplication::onShutdown()
 {
-  m_qmlContext->getMainRenderer()->getView()->cleanUp();
+  // TODO
+  //m_qmlContext->getMainRenderer()->getView()->cleanUp();
 }
 
 int QmlGameApplication::execApp()

@@ -6,14 +6,14 @@ namespace qmlOsgBridge
 {
 
 DefaultRenderer::DefaultRenderer() :
-  m_view(new osgHelper::View()),
+  m_view(new osgViewer::View()),
   m_window(nullptr)
 {
 }
 
 DefaultRenderer::~DefaultRenderer() = default;
 
-osg::ref_ptr<osgHelper::View> DefaultRenderer::getView() const
+osg::ref_ptr<osgViewer::View> DefaultRenderer::getView() const
 {
   return m_view;
 }

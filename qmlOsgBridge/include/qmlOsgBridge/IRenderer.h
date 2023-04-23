@@ -20,7 +20,7 @@ public:
   IRenderer() = default;
   ~IRenderer() override = default;
 
-  virtual osg::ref_ptr<osgHelper::View> getView() const = 0;
+  virtual osg::ref_ptr<osgViewer::View> getView() const = 0;
   virtual QPointer<QQuickWindow> getQuickWindow() const = 0;
   virtual QPointer<QQuickItem> getViewportItem() const = 0;
 
