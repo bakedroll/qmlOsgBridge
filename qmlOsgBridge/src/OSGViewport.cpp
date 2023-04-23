@@ -70,12 +70,6 @@ void OSGViewport::prepareNode()
   m_textureNode->setTexture(m_displayTexture);
 }
 
-void OSGViewport::deleteFrameBufferObjects()
-{
-  m_renderFbo.reset();
-  m_displayFbo.reset();
-}
-
 osg::ref_ptr<osgViewer::View> OSGViewport::getView() const
 {
   return m_renderer->getView();
@@ -128,16 +122,6 @@ QSGNode* OSGViewport::updatePaintNode(
     delete oldNode;
   }
 
-  /*if (m_window->initializeRenderContextIfNecessary())
-  {
-    return nullptr;
-  }*/
-
-  if (!m_window->isReady())
-  {
-    m_window->setReady();
-  }
-
   return m_textureNode;
 }
 
@@ -187,8 +171,6 @@ void OSGViewport::postDrawFunction()
     return;
   }
 
-  // TODO: remove
-  //m_window->flush();
   m_renderFbo->bindDefault();
 
   std::swap(m_renderFbo, m_displayFbo);
@@ -204,15 +186,12 @@ void OSGViewport::updateViewport()
   {
     if (m_renderSize != size)
     {
-      //m_window->dispatchRenderThreadBlocking([this, size]()
-      //{
-        //m_renderer->getView()->updateResolution(osg::Vec2i(size.width(), size.height()));
-        const auto viewport = new osg::Viewport(0, 0, size.width(), size.height());
-        m_renderer->getView()->getCamera()->setViewport(viewport);
+      //m_renderer->getView()->updateResolution(osg::Vec2i(size.width(), size.height()));
+      const auto viewport = new osg::Viewport(0, 0, size.width(), size.height());
+      m_renderer->getView()->getCamera()->setViewport(viewport);
 
-        m_renderSize = size;
-        m_remainingSizeUpdateSteps = m_remainingSizeUpdateSteps % 2 + 2;
-      //});
+      m_renderSize = size;
+      m_remainingSizeUpdateSteps = m_remainingSizeUpdateSteps % 2 + 2;
     }
   }
   else if (m_renderer)

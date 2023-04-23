@@ -32,7 +32,6 @@ public:
   void acceptWindow(IWindow* window);
 
   void prepareNode() override;
-  void deleteFrameBufferObjects() override;
 
   osg::ref_ptr<osgViewer::View> getView() const override;
 

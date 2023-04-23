@@ -1,15 +1,11 @@
 #pragma once
 
 #include <QObject>
-#include <QPointer>
-#include <QQuickWindow>
-#include <QThread>
 
 #include <osgViewer/CompositeViewer>
 
 #include "IWindow.h"
 
-#include <memory>
 #include <set>
 
 namespace qmlOsgBridge
@@ -29,20 +25,11 @@ public:
 
   QPointer<QQuickWindow> getQuickWindow() const override;
 
-  void flush() override;
   void frame() override;
-  void deleteFbos() override;
   int getMinFrameTimeMs() const override;
-
-  bool isReady() const override;
-  void setReady() override;
 
   void addViewport(IOSGViewport& viewport) override;
   void removeViewport(IOSGViewport& viewport) override;
-
-  bool initializeRenderContextIfNecessary() override;
-  void dispatchRenderThread(const std::function<void()>& func) override;
-  void dispatchRenderThreadBlocking(const std::function<void()>& func) override;
 
   QPointer<QThread> getRenderThread() const override;
 
@@ -50,19 +37,12 @@ public:
   static void closeAll();
 
 public Q_SLOTS:
-  void ready();
-  void newTexture();
   void prepareNodes();
-  void onSceneGraphAboutToStop();
+  // TODO: needed?
+  //void onSceneGraphAboutToStop();
 
 Q_SIGNALS:
-  void textureInUse();
   void pendingNewTexture();
-  void triggerDispatchRenderThread(const std::function<void()>& func);
-  void triggerDispatchRenderThreadBlocking(const std::function<void()>& func);
-
-protected:
-  void timerEvent(QTimerEvent* event) override;
 
 private:
   static std::map<QQuickWindow*, IWindow*> m_windowsStorage;
@@ -72,12 +52,8 @@ private:
 
   std::set<IOSGViewport*> m_viewports;
 
-  QPointer<QThread> m_renderThread;
-  std::unique_ptr<RenderWorker> m_renderWorker;
-
   bool m_isNewTexture;
-  bool m_isReady;
-  int m_frameTimer;
+  bool m_isInitialized;
 
 };
 

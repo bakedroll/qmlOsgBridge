@@ -39,7 +39,8 @@ void DefaultRenderer::dispatchRenderThread(const std::function<void()>& func) co
     UTILS_LOG_ERROR("Could not dispatch to render thread due to unknown context window");
     return;
   }
-  m_window->dispatchRenderThread(func);
+  // TODO:
+  //m_window->dispatchRenderThread(func);
 }
 
 void DefaultRenderer::moveObjectToRenderThread(const QPointer<QObject>& obj) const
