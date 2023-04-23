@@ -32,7 +32,6 @@ public:
 public Q_SLOTS:
   void render();
   void shutdown();
-  void requestNext();
   void dispatch(const std::function<void()>& func);
 
 Q_SIGNALS:
@@ -44,8 +43,6 @@ private:
   QPointer<QOffscreenSurface> m_surface;
   QPointer<QOpenGLContext> m_context;
 
-  QPointer<QTimer> m_nextFrameTimer;
-  QElapsedTimer m_frameTimeMeasure;
   bool m_shuttingDown;
 
 };

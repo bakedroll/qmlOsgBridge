@@ -3,8 +3,6 @@
 
 #include <QtUtilsLib/Multithreading.h>
 
-#include <QSurfaceFormat>
-
 #include <qmlOsgBridge/IQmlContext.h>
 #include <qmlOsgBridge/OSGViewport.h>
 #include <qmlOsgBridge/IRenderer.h>
@@ -23,10 +21,6 @@ QmlGameApplication::QmlGameApplication(int& argc, char** argv) :
   MultithreadedApplication<QGuiApplication>(argc, argv),
   GameStatesApplication()
 {
-  auto format = QSurfaceFormat::defaultFormat();
-  format.setSwapInterval(0);
-  QSurfaceFormat::setDefaultFormat(format);
-
   qmlRegisterType<qmlOsgBridge::OSGViewport>(s_qmlUri, s_majorVersion, s_minorVersion, "OSGViewport");
   qRegisterMetaType<QPointer<IRenderer>>("QPointer<IRenderer>");
 
