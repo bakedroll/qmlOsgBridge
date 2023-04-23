@@ -157,7 +157,6 @@ void Window::prepareNodes()
     m_isNewTexture = false;
     Q_EMIT textureInUse();
   }
-  Q_EMIT pendingNewTexture();
 }
 
 std::map<QQuickWindow*, IWindow*> Window::m_windowsStorage;

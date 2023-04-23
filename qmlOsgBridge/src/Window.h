@@ -53,7 +53,6 @@ public Q_SLOTS:
 
 Q_SIGNALS:
   void textureInUse();
-  void pendingNewTexture();
   void triggerDispatchRenderThread(const std::function<void()>& func);
   void triggerDispatchRenderThreadBlocking(const std::function<void()>& func);
 
