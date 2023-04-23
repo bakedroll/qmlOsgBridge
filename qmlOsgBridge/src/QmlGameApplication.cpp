@@ -3,8 +3,6 @@
 
 #include <QtUtilsLib/Multithreading.h>
 
-#include <QSurfaceFormat>
-
 #include <qmlOsgBridge/IQmlContext.h>
 #include <qmlOsgBridge/OSGViewport.h>
 #include <qmlOsgBridge/IRenderer.h>
@@ -23,10 +21,6 @@ QmlGameApplication::QmlGameApplication(int& argc, char** argv) :
   MultithreadedApplication<QGuiApplication>(argc, argv),
   GameStatesApplication()
 {
-  /*auto format = QSurfaceFormat::defaultFormat();
-  format.setSwapInterval(1);
-  QSurfaceFormat::setDefaultFormat(format);*/
-
   qmlRegisterType<qmlOsgBridge::OSGViewport>(s_qmlUri, s_majorVersion, s_minorVersion, "OSGViewport");
   qRegisterMetaType<QPointer<IRenderer>>("QPointer<IRenderer>");
 
@@ -43,6 +37,7 @@ QmlGameApplication::~QmlGameApplication()
 
 void QmlGameApplication::onInitialize(const osg::ref_ptr<libQtGame::GameUpdateCallback>& updateCallback)
 {
+  connect(m_qmlContext->getMainRenderer(), &IRenderer::renderThreadChanged, this, &QmlGameApplication::onRenderThreadChanged);
   m_qmlContext->getMainRenderer()->getView()->getSceneData()->addUpdateCallback(updateCallback);
 }
 
@@ -52,8 +47,12 @@ void QmlGameApplication::onPrepareGameState(const osg::ref_ptr<libQtGame::Abstra
   auto* eventState = dynamic_cast<EventProcessingState*>(state.get());
   if (eventState)
   {
-    //m_qmlContext->getMainRenderer()->moveObjectToRenderThread(eventState);
-    m_qmlContext->getMainRenderer()->getViewportItem()->installEventFilter(&eventState->eventHandler());
+    const auto renderer = m_qmlContext->getMainRenderer();
+    if (renderer->hasRenderThread())
+    {
+      renderer->moveObjectToRenderThread(eventState);
+      renderer->getViewportItem()->installEventFilter(&eventState->eventHandler());
+    }
 
     eventState->onInitialize(m_qmlContext->getMainRenderer(), simData);
   }
@@ -113,6 +112,20 @@ std::vector<QString> QmlGameApplication::qmlImportPaths() const
 void QmlGameApplication::receiveWarnings(const QList<QQmlError>& warnings)
 {
   m_warnings = warnings;
+}
+
+void QmlGameApplication::onRenderThreadChanged(QThread* renderThread)
+{
+  const auto renderer = m_qmlContext->getMainRenderer();
+  for (const auto& stateData : m_states)
+  {
+    auto* eventState = dynamic_cast<EventProcessingState*>(stateData.state.get());
+    if (eventState)
+    {
+      renderer->moveObjectToRenderThread(eventState);
+      renderer->getViewportItem()->installEventFilter(&eventState->eventHandler());
+    }
+  }
 }
 
 void QmlGameApplication::addQmlImportPaths()

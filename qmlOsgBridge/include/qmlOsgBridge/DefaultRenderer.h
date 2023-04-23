@@ -19,6 +19,7 @@ public:
   QPointer<QQuickWindow> getQuickWindow() const override;
   QPointer<QQuickItem> getViewportItem() const override;
 
+  bool hasRenderThread() const override;
   void dispatchRenderThread(const std::function<void()>& func) const override;
   void moveObjectToRenderThread(const QPointer<QObject>& obj) const override;
 

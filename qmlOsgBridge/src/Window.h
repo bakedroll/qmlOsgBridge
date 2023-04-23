@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QObject>
+#include <QThread>
 
 #include <osgViewer/CompositeViewer>
 
@@ -25,7 +26,6 @@ public:
 
   QPointer<QQuickWindow> getQuickWindow() const override;
 
-  void frame() override;
   int getMinFrameTimeMs() const override;
 
   void addViewport(IOSGViewport& viewport) override;
@@ -33,7 +33,7 @@ public:
 
   QPointer<QThread> getRenderThread() const override;
 
-  static IWindow* fromQuickWindow(QQuickWindow* quickWindow);
+  static Window* fromQuickWindow(QQuickWindow* quickWindow);
   static void closeAll();
 
 public Q_SLOTS:
@@ -43,17 +43,16 @@ public Q_SLOTS:
 
 Q_SIGNALS:
   void pendingNewTexture();
+  void renderThreadChanged(QThread* renderThread);
 
 private:
-  static std::map<QQuickWindow*, IWindow*> m_windowsStorage;
+  static std::map<QQuickWindow*, Window*> m_windowsStorage;
 
   QQuickWindow* m_quickWindow;
   osg::ref_ptr<osgViewer::CompositeViewer> m_viewer;
+  QPointer<QThread> m_renderThread;
 
   std::set<IOSGViewport*> m_viewports;
-
-  bool m_isNewTexture;
-  bool m_isInitialized;
 
 };
 

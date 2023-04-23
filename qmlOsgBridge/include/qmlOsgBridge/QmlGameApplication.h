@@ -59,6 +59,7 @@ protected:
 
 private Q_SLOTS:
   void receiveWarnings(const QList<QQmlError>& warnings);
+  void onRenderThreadChanged(QThread* renderThread);
 
 private:
   static const char* s_qmlUri;

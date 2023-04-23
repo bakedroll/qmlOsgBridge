@@ -13,9 +13,7 @@ static constexpr int c_minFrameTimeNs = 16; // 16 ms per frame
 Window::Window(QQuickWindow* quickWindow) :
   QObject(quickWindow),
   m_quickWindow(quickWindow),
-  m_viewer(new osgViewer::CompositeViewer()),
-  m_isNewTexture(false),
-  m_isInitialized(false)
+  m_viewer(new osgViewer::CompositeViewer())
 {
   // TODO:
   //connect(m_quickWindow, &QQuickWindow::sceneGraphAboutToStop, this, &Window::onSceneGraphAboutToStop);
@@ -38,13 +36,6 @@ QPointer<QQuickWindow> Window::getQuickWindow() const
   return m_quickWindow;
 }
 
-void Window::frame()
-{
-  QOpenGLContext::currentContext()->functions()->glUseProgram(0);
-  m_viewer->frame();
-  m_isNewTexture = true;
-}
-
 int Window::getMinFrameTimeMs() const
 {
   return c_minFrameTimeNs;
@@ -64,11 +55,10 @@ void Window::removeViewport(IOSGViewport& viewport)
 
 QPointer<QThread> Window::getRenderThread() const
 {
-  // TODO
-  return nullptr;
+  return m_renderThread;
 }
 
-IWindow* Window::fromQuickWindow(QQuickWindow* quickWindow)
+Window* Window::fromQuickWindow(QQuickWindow* quickWindow)
 {
   if (m_windowsStorage.count(quickWindow) == 0)
   {
@@ -87,20 +77,23 @@ void Window::closeAll()
 
 void Window::prepareNodes()
 {
-  if(m_isNewTexture)
+  if (!m_renderThread)
   {
-    for (const auto& viewport : m_viewports)
-    {
-      viewport->prepareNode();
-    }
-
-    m_isNewTexture = false;
+    m_renderThread = QThread::currentThread();
+    Q_EMIT renderThreadChanged(m_renderThread);
   }
 
-  frame();
+  QOpenGLContext::currentContext()->functions()->glUseProgram(0);
+  m_viewer->frame();
+
+  for (const auto& viewport : m_viewports)
+  {
+    viewport->prepareNode();
+  }
+
   Q_EMIT pendingNewTexture();
 }
 
-std::map<QQuickWindow*, IWindow*> Window::m_windowsStorage;
+std::map<QQuickWindow*, Window*> Window::m_windowsStorage;
 
 }

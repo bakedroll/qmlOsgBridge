@@ -24,11 +24,15 @@ public:
   virtual QPointer<QQuickWindow> getQuickWindow() const = 0;
   virtual QPointer<QQuickItem> getViewportItem() const = 0;
 
+  virtual bool hasRenderThread() const = 0;
   virtual void dispatchRenderThread(const std::function<void()>& func) const = 0;
   virtual void moveObjectToRenderThread(const QPointer<QObject>& obj) const = 0;
 
   virtual void setContextWindow(IWindow* window) = 0;
   virtual void setViewportItem(const QPointer<QQuickItem>& viewport) = 0;
+
+Q_SIGNALS:
+  void renderThreadChanged(QThread* renderThread);
 
 };
 

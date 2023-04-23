@@ -18,7 +18,6 @@ public:
 
   virtual QPointer<QQuickWindow> getQuickWindow() const = 0;
 
-  virtual void frame() = 0;
   virtual int getMinFrameTimeMs() const = 0;
 
   virtual void addViewport(IOSGViewport& viewport) = 0;

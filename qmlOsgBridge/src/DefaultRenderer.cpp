@@ -32,11 +32,16 @@ QPointer<QQuickItem> DefaultRenderer::getViewportItem() const
   return m_viewport;
 }
 
+bool DefaultRenderer::hasRenderThread() const
+{
+  return m_window->getRenderThread() != nullptr;
+}
+
 void DefaultRenderer::dispatchRenderThread(const std::function<void()>& func) const
 {
-  if (!m_window)
+  if (!m_window || !m_window->getRenderThread())
   {
-    UTILS_LOG_ERROR("Could not dispatch to render thread due to unknown context window");
+    UTILS_LOG_ERROR("Could not dispatch to render thread");
     return;
   }
   // TODO:

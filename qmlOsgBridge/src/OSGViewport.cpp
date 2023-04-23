@@ -85,11 +85,14 @@ void OSGViewport::setRenderer(const QPointer<IRenderer>& renderer)
   if (m_renderer)
   {
     UTILS_LOG_WARN("Unable to reset renderer");
+    return;
   }
 
   m_renderer = renderer;
   m_renderer->setContextWindow(m_window);
   m_renderer->setViewportItem(this);
+
+  connect(this, &OSGViewport::renderThreadChanged, m_renderer, &IRenderer::renderThreadChanged);
 
   const auto preDrawCallback = new DrawCallbackFunc(std::bind(&OSGViewport::preDrawFunction, this));
   const auto postDrawCallback = new DrawCallbackFunc(std::bind(&OSGViewport::postDrawFunction, this));
@@ -139,7 +142,9 @@ void OSGViewport::itemChange(QQuickItem::ItemChange change, const QQuickItem::It
 {
   if(change == QQuickItem::ItemSceneChange && value.window)
   {
-    acceptWindow(Window::fromQuickWindow(value.window));
+    const auto window = Window::fromQuickWindow(value.window);
+    connect(window, &Window::renderThreadChanged, this, &OSGViewport::renderThreadChanged);
+    acceptWindow(window);
   }
   QQuickItem::itemChange(change, value);
 }
@@ -176,8 +181,6 @@ void OSGViewport::postDrawFunction()
 void OSGViewport::updateViewport()
 {
   const auto size = boundingRect().size().toSize();
-
-
   if (m_textureNode)
   {
     if (m_renderSize != size)

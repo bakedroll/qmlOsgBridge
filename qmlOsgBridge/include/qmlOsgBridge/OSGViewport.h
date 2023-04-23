@@ -38,6 +38,9 @@ public:
   QPointer<IRenderer> renderer() const;
   void setRenderer(const QPointer<IRenderer>& renderer);
 
+Q_SIGNALS:
+  void renderThreadChanged(QThread* renderThread);
+
 protected:
   QSGNode* updatePaintNode(QSGNode* oldNode, QQuickItem::UpdatePaintNodeData* updatePaintNodeData) override;
   void geometryChanged(const QRectF& newGeometry, const QRectF& oldGeometry) override;
