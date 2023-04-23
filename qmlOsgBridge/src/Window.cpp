@@ -72,7 +72,7 @@ void Window::frame()
   }
   m_viewer->frame();
   m_isNewTexture = true;
-  prepareNodes();
+  //prepareNodes();
 }
 
 void Window::deleteFbos()
@@ -187,6 +187,8 @@ void Window::prepareNodes()
     m_isNewTexture = false;
     Q_EMIT textureInUse();
   }
+
+  frame();
   Q_EMIT pendingNewTexture();
 }
 
@@ -203,7 +205,8 @@ void Window::timerEvent(QTimerEvent* event)
 {
   if (event->timerId() == m_frameTimer)
   {
-    frame();
+    // TODO:
+    //frame();
   }
 
   QObject::timerEvent(event);

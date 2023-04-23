@@ -53,7 +53,7 @@ void QmlGameApplication::onPrepareGameState(const osg::ref_ptr<libQtGame::Abstra
   auto* eventState = dynamic_cast<EventProcessingState*>(state.get());
   if (eventState)
   {
-    m_qmlContext->getMainRenderer()->moveObjectToRenderThread(eventState);
+    //m_qmlContext->getMainRenderer()->moveObjectToRenderThread(eventState);
     m_qmlContext->getMainRenderer()->getViewportItem()->installEventFilter(&eventState->eventHandler());
 
     eventState->onInitialize(m_qmlContext->getMainRenderer(), simData);
