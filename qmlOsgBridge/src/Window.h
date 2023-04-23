@@ -32,7 +32,10 @@ public:
   void flush() override;
   void frame() override;
   void deleteFbos() override;
-  int getMinFrameTimeNs() const override;
+  int getMinFrameTimeMs() const override;
+
+  bool isReady() const override;
+  void setReady() override;
 
   void addViewport(IOSGViewport& viewport) override;
   void removeViewport(IOSGViewport& viewport) override;
@@ -50,12 +53,16 @@ public Q_SLOTS:
   void ready();
   void newTexture();
   void prepareNodes();
+  void onSceneGraphAboutToStop();
 
 Q_SIGNALS:
   void textureInUse();
   void pendingNewTexture();
   void triggerDispatchRenderThread(const std::function<void()>& func);
   void triggerDispatchRenderThreadBlocking(const std::function<void()>& func);
+
+protected:
+  void timerEvent(QTimerEvent* event) override;
 
 private:
   static std::map<QQuickWindow*, IWindow*> m_windowsStorage;
@@ -69,6 +76,8 @@ private:
   std::unique_ptr<RenderWorker> m_renderWorker;
 
   bool m_isNewTexture;
+  bool m_isReady;
+  int m_frameTimer;
 
 };
 

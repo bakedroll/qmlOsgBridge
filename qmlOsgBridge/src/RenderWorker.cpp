@@ -66,7 +66,7 @@ void RenderWorker::render()
 
   m_window.frame();
 
-  const auto minFrameTimeNs = m_window.getMinFrameTimeNs();
+  const auto minFrameTimeNs = m_window.getMinFrameTimeMs();
   const auto frameTimeNs = m_frameTimeMeasure.elapsed();
 
   if (frameTimeNs < minFrameTimeNs)

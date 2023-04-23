@@ -20,6 +20,7 @@ OSGViewport::OSGViewport(QQuickItem* parent) :
 
   forceActiveFocus();
   setAcceptHoverEvents(true);
+  setAcceptedMouseButtons(Qt::AllButtons);
 }
 
 OSGViewport::~OSGViewport()
@@ -28,14 +29,6 @@ OSGViewport::~OSGViewport()
   {
     m_window->removeViewport(*this);
   }
-}
-
-void OSGViewport::classBegin()
-{
-  setAcceptHoverEvents(true);
-  setAcceptedMouseButtons(Qt::AllButtons);
-
-  QQuickItem::classBegin();
 }
 
 void OSGViewport::acceptWindow(IWindow* window)
@@ -135,9 +128,14 @@ QSGNode* OSGViewport::updatePaintNode(
     delete oldNode;
   }
 
-  if (m_window->initializeRenderContextIfNecessary())
+  /*if (m_window->initializeRenderContextIfNecessary())
   {
     return nullptr;
+  }*/
+
+  if (!m_window->isReady())
+  {
+    m_window->setReady();
   }
 
   return m_textureNode;
@@ -189,7 +187,8 @@ void OSGViewport::postDrawFunction()
     return;
   }
 
-  m_window->flush();
+  // TODO: remove
+  //m_window->flush();
   m_renderFbo->bindDefault();
 
   std::swap(m_renderFbo, m_displayFbo);
@@ -205,15 +204,15 @@ void OSGViewport::updateViewport()
   {
     if (m_renderSize != size)
     {
-      m_window->dispatchRenderThreadBlocking([this, size]()
-      {
+      //m_window->dispatchRenderThreadBlocking([this, size]()
+      //{
         //m_renderer->getView()->updateResolution(osg::Vec2i(size.width(), size.height()));
         const auto viewport = new osg::Viewport(0, 0, size.width(), size.height());
         m_renderer->getView()->getCamera()->setViewport(viewport);
 
         m_renderSize = size;
         m_remainingSizeUpdateSteps = m_remainingSizeUpdateSteps % 2 + 2;
-      });
+      //});
     }
   }
   else if (m_renderer)

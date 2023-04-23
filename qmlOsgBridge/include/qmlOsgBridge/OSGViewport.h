@@ -29,7 +29,6 @@ public:
 
   Q_PROPERTY(QPointer<IRenderer> renderer READ renderer WRITE setRenderer REQUIRED)
 
-  void classBegin() override;
   void acceptWindow(IWindow* window);
 
   void prepareNode() override;
