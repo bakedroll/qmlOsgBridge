@@ -16,15 +16,7 @@ void MainState::onInitialize(const QPointer<qmlOsgBridge::IRenderer>& renderer, 
 {
   const auto view = renderer->getView();
 
-  const auto drawable = new osg::ShapeDrawable(new osg::Sphere(osg::Vec3(0.0, 0.0, 0.0), 1.0));
-
-  m_transform = new osg::PositionAttitudeTransform();
-  m_transform->setPosition(osg::Vec3d(0.0, 0.0, -5.0));
-  m_transform->addChild(drawable);
-
-  view->setSceneData(m_transform);
-
-  /*auto camera = view->getCamera(osgHelper::View::CameraType::Scene);
+  auto camera = view->getCamera(osgHelper::View::CameraType::Scene);
   camera->setPosition(osg::Vec3f(0, -5, 0));
   camera->setClearColor(osg::Vec4(0.0, 0.0, 0.0, 1.0));
 
@@ -49,12 +41,12 @@ void MainState::onInitialize(const QPointer<qmlOsgBridge::IRenderer>& renderer, 
 
   view->getRootGroup()->addChild(lightingNode);
 
-  view->addPostProcessingEffect(m_hdr, true, m_hdr->Name);*/
+  view->addPostProcessingEffect(m_hdr, true, m_hdr->Name);
 }
 
 void MainState::onUpdate(const SimulationData& data)
 {
-  //m_transform->setPosition(osg::Vec3d(0.0, 3.0 - 5.0 * cos(data.time), 0.0));
+  m_transform->setPosition(osg::Vec3d(0.0, 3.0 - 5.0 * cos(data.time), 0.0));
 }
 
 bool MainState::onKeyEvent(QKeyEvent* event)

@@ -98,14 +98,10 @@ void OSGViewport::setRenderer(const QPointer<IRenderer>& renderer)
   auto* ea = view->getEventQueue()->getCurrentEventState();
   ea->setMouseYOrientation(osgGA::GUIEventAdapter::Y_INCREASING_UPWARDS);
 
-  /*view->getCamera(osgHelper::View::CameraType::Screen)->setPreDrawCallback(preDrawCallback);
+  view->getCamera(osgHelper::View::CameraType::Screen)->setPreDrawCallback(preDrawCallback);
   view->getCamera(osgHelper::View::CameraType::Screen)->setPostDrawCallback(postDrawCallback);
   view->getCamera(osgHelper::View::CameraType::Screen)->setGraphicsContext(m_context);
-  view->getCamera(osgHelper::View::CameraType::Scene)->setGraphicsContext(m_context);*/
-
-  view->getCamera()->setPreDrawCallback(preDrawCallback);
-  view->getCamera()->setPostDrawCallback(postDrawCallback);
-  view->getCamera()->setGraphicsContext(m_context);
+  view->getCamera(osgHelper::View::CameraType::Scene)->setGraphicsContext(m_context);
 
   view->getEventQueue()->setGraphicsContext(m_context);
 
@@ -186,9 +182,7 @@ void OSGViewport::updateViewport()
   {
     if (m_renderSize != size)
     {
-      //m_renderer->getView()->updateResolution(osg::Vec2i(size.width(), size.height()));
-      const auto viewport = new osg::Viewport(0, 0, size.width(), size.height());
-      m_renderer->getView()->getCamera()->setViewport(viewport);
+      m_renderer->getView()->updateResolution(osg::Vec2i(size.width(), size.height()));
 
       m_renderSize = size;
       m_remainingSizeUpdateSteps = m_remainingSizeUpdateSteps % 2 + 2;
@@ -196,9 +190,7 @@ void OSGViewport::updateViewport()
   }
   else if (m_renderer)
   {
-    //m_renderer->getView()->updateResolution(osg::Vec2i(size.width(), size.height()));
-    const auto viewport = new osg::Viewport(0, 0, size.width(), size.height());
-    m_renderer->getView()->getCamera()->setViewport(viewport);
+    m_renderer->getView()->updateResolution(osg::Vec2i(size.width(), size.height()));
   }
 }
 

@@ -43,8 +43,7 @@ QmlGameApplication::~QmlGameApplication()
 
 void QmlGameApplication::onInitialize(const osg::ref_ptr<libQtGame::GameUpdateCallback>& updateCallback)
 {
-  // TODO:
-  // m_qmlContext->getMainRenderer()->getView()->getSceneData()->addUpdateCallback(updateCallback);
+  m_qmlContext->getMainRenderer()->getView()->getSceneData()->addUpdateCallback(updateCallback);
 }
 
 void QmlGameApplication::onPrepareGameState(const osg::ref_ptr<libQtGame::AbstractGameState>& state,
@@ -83,8 +82,7 @@ void QmlGameApplication::onEmptyStateList()
 
 void QmlGameApplication::onShutdown()
 {
-  // TODO
-  //m_qmlContext->getMainRenderer()->getView()->cleanUp();
+  m_qmlContext->getMainRenderer()->getView()->cleanUp();
 }
 
 int QmlGameApplication::execApp()
