@@ -32,7 +32,6 @@ public:
   void flush() override;
   void frame() override;
   void deleteFbos() override;
-  int getMinFrameTimeNs() const override;
 
   void addViewport(IOSGViewport& viewport) override;
   void removeViewport(IOSGViewport& viewport) override;

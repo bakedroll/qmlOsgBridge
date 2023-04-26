@@ -1,12 +1,10 @@
 #pragma once
 
-#include <QElapsedTimer>
 #include <QObject>
 #include <QOffscreenSurface>
 #include <QOpenGLContext>
 #include <QPointer>
 #include <QQuickWindow>
-#include <QTimer>
 
 namespace qmlOsgBridge
 {

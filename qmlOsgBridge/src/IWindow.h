@@ -21,7 +21,6 @@ public:
   virtual void flush() = 0;
   virtual void frame() = 0;
   virtual void deleteFbos() = 0;
-  virtual int getMinFrameTimeNs() const = 0;
 
   virtual void addViewport(IOSGViewport& viewport) = 0;
   virtual void removeViewport(IOSGViewport& viewport) = 0;

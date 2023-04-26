@@ -66,11 +66,6 @@ void Window::deleteFbos()
   }
 }
 
-int Window::getMinFrameTimeNs() const
-{
-  return c_minFrameTimeNs;
-}
-
 void Window::addViewport(IOSGViewport& viewport)
 {
   m_viewports.insert(&viewport);
