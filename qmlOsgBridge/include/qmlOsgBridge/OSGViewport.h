@@ -23,11 +23,12 @@ class OSGViewport : public QQuickItem,
                     public IOSGViewport
 {
   Q_OBJECT
+
+  Q_PROPERTY(QPointer<IRenderer> renderer READ renderer WRITE setRenderer REQUIRED)
+
 public:
   explicit OSGViewport(QQuickItem* parent = nullptr);
   ~OSGViewport() override;
-
-  Q_PROPERTY(QPointer<IRenderer> renderer READ renderer WRITE setRenderer REQUIRED)
 
   void classBegin() override;
   void acceptWindow(IWindow* window);

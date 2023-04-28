@@ -17,6 +17,8 @@ class IQmlContext : public QObject,
 {
   Q_OBJECT
 
+  Q_PROPERTY(QPointer<IRenderer> renderer READ getMainRenderer CONSTANT)
+
 public:
   enum class ActionType
   {
@@ -27,7 +29,6 @@ public:
   IQmlContext() = default;
   ~IQmlContext() override = default;
 
-  Q_PROPERTY(QPointer<IRenderer> renderer READ getMainRenderer CONSTANT)
   virtual QPointer<IRenderer> getMainRenderer() const = 0;
 
   virtual void onGameStateAction(
