@@ -198,11 +198,10 @@ void OSGViewport::updateViewport()
   {
     if (m_renderSize != size)
     {
-      m_window->dispatchRenderThreadBlocking([this, size]()
+      m_renderSize = size;
+      m_window->dispatchRenderThread([this, size]()
       {
         m_renderer->getView()->updateResolution(osg::Vec2i(size.width(), size.height()));
-
-        m_renderSize = size;
         m_remainingSizeUpdateSteps = m_remainingSizeUpdateSteps % 2 + 2;
       });
     }
