@@ -5,9 +5,10 @@
 #include <osgHelper/LightingNode.h>
 
 MainState::MainState(osgHelper::ioc::Injector& injector) :
-  EventProcessingState(injector),
+  QmlGameState(injector),
   m_hdr(injector.inject<osgHelper::ppu::HDR>())
 {
+  enableEventHandling();
 }
 
 MainState::~MainState() = default;

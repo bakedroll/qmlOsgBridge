@@ -1,5 +1,5 @@
 #include <qmlOsgBridge/QmlGameApplication.h>
-#include <qmlOsgBridge/EventProcessingState.h>
+#include <qmlOsgBridge/QmlGameState.h>
 
 #include <QtUtilsLib/Multithreading.h>
 
@@ -43,11 +43,14 @@ void QmlGameApplication::onInitialize(const osg::ref_ptr<libQtGame::GameUpdateCa
 void QmlGameApplication::onPrepareGameState(const osg::ref_ptr<libQtGame::AbstractGameState>& state,
   const libQtGame::AbstractGameState::SimulationData& simData)
 {
-  auto* eventState = dynamic_cast<EventProcessingState*>(state.get());
+  auto* eventState = dynamic_cast<QmlGameState*>(state.get());
   if (eventState)
   {
     m_qmlContext->getMainRenderer()->moveObjectToRenderThread(eventState);
-    m_qmlContext->getMainRenderer()->getViewportItem()->installEventFilter(&eventState->eventHandler());
+    if (eventState->isEventHandlingEnabled())
+    {
+      m_qmlContext->getMainRenderer()->getViewportItem()->installEventFilter(&eventState->eventHandler());
+    }
 
     eventState->onInitialize(m_qmlContext->getMainRenderer(), simData);
   }
@@ -57,8 +60,8 @@ void QmlGameApplication::onPrepareGameState(const osg::ref_ptr<libQtGame::Abstra
 
 void QmlGameApplication::onExitGameState(const osg::ref_ptr<libQtGame::AbstractGameState>& state)
 {
-  auto* eventState = dynamic_cast<EventProcessingState*>(state.get());
-  if (eventState)
+  auto* eventState = dynamic_cast<QmlGameState*>(state.get());
+  if (eventState && eventState->isEventHandlingEnabled())
   {
     m_qmlContext->getMainRenderer()->getViewportItem()->removeEventFilter(&eventState->eventHandler());
   }

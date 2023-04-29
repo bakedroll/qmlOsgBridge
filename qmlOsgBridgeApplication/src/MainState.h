@@ -1,12 +1,12 @@
 #pragma once
 
-#include <qmlOsgBridge/EventProcessingState.h>
+#include <qmlOsgBridge/QmlGameState.h>
 
 #include <osg/PositionAttitudeTransform>
 
 #include <osgHelper/ppu/HDR.h>
 
-class MainState : public qmlOsgBridge::EventProcessingState
+class MainState : public qmlOsgBridge::QmlGameState
 {
   Q_OBJECT
 

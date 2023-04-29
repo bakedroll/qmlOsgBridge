@@ -13,19 +13,18 @@ namespace qmlOsgBridge
 
 class IRenderer;
 
-class EventProcessingState : public libQtGame::AbstractGameState
+class QmlGameState : public libQtGame::AbstractGameState
 {
 public:
-  EventProcessingState(osgHelper::ioc::Injector& injector);
-  ~EventProcessingState() override;
+  QmlGameState(osgHelper::ioc::Injector& injector);
+  ~QmlGameState() override;
 
   virtual void onInitialize(const QPointer<IRenderer>& renderer, const SimulationData& data);
 
+  bool isEventHandlingEnabled() const;
   libQtGame::KeyboardMouseEventFilter& eventHandler() const;
 
 protected:
-  virtual void onResizeEvent(QResizeEvent* event);
-
   virtual bool onKeyEvent(QKeyEvent* event);
   virtual bool onMouseEvent(QMouseEvent* event);
   virtual bool onWheelEvent(QWheelEvent* event);
@@ -34,6 +33,8 @@ protected:
   virtual void onDragMove(
     Qt::MouseButton button, const osg::Vec2f& origin, const osg::Vec2f& position, const osg::Vec2f& change);
   virtual void onDragEnd(Qt::MouseButton button, const osg::Vec2f& origin, const osg::Vec2f& position);
+
+  void enableEventHandling();
 
 private Q_SLOTS:
   void forwardKeyEvent(QKeyEvent* event, bool& accepted);
