@@ -43,6 +43,8 @@ void QmlGameApplication::onInitialize(const osg::ref_ptr<libQtGame::GameUpdateCa
 void QmlGameApplication::onPrepareGameState(const osg::ref_ptr<libQtGame::AbstractGameState>& state,
   const libQtGame::AbstractGameState::SimulationData& simData)
 {
+  m_qmlContext->onGameStateAction(state, IQmlContext::ActionType::Enter);
+
   auto* eventState = dynamic_cast<QmlGameState*>(state.get());
   if (eventState)
   {
@@ -54,8 +56,6 @@ void QmlGameApplication::onPrepareGameState(const osg::ref_ptr<libQtGame::Abstra
 
     eventState->onInitialize(m_qmlContext->getMainRenderer(), simData);
   }
-
-  m_qmlContext->onGameStateAction(state, IQmlContext::ActionType::Enter);
 }
 
 void QmlGameApplication::onExitGameState(const osg::ref_ptr<libQtGame::AbstractGameState>& state)
