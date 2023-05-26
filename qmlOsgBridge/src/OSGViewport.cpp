@@ -1,214 +1,181 @@
-#include "qmlOsgBridge/OSGViewport.h"
+#include <qmlOsgBridge/OSGViewport.h>
 
-#include <qmlOsgBridge/IRenderer.h>
+#include <QSGSimpleTextureNode>
+#include <QTimer>
 
-#include "DrawCallbackFunc.h"
-#include "Window.h"
+#include <osgGA/EventQueue>
+
+#include "RendererImpl.h"
+#include "WindowsStorage.h"
 
 namespace qmlOsgBridge
 {
 
+static const int s_FrameIntervalMs = 16;
+
+static int qtToOsgMouseButton(const QMouseEvent& event)
+{
+  switch (event.button())
+  {
+    case Qt::LeftButton:
+      return 1;
+    case Qt::MiddleButton:
+      return 2;
+    case Qt::RightButton:
+      return 3;
+    default:
+      break;
+  }
+  return 0;
+}
+
 OSGViewport::OSGViewport(QQuickItem* parent) :
-  QQuickItem(parent),
-  m_window(nullptr),
-  m_textureNode(nullptr),
-  m_context(new osgViewer::GraphicsWindowEmbedded(0, 0, 1, 1)),
-  m_remainingSizeUpdateSteps(2),
-  m_needPrepareNodesUpdate(false)
+  QQuickFramebufferObject(parent),
+  m_viewer(new osgViewer::CompositeViewer()),
+  m_window(new osgViewer::GraphicsWindowEmbedded(0, 0, 1, 1)),
+  m_pendingEvents(new osgGA::EventQueue(osgGA::GUIEventAdapter::Y_INCREASING_DOWNWARDS))
 {
-  m_format.setAttachment(QOpenGLFramebufferObject::CombinedDepthStencil);
-
-  forceActiveFocus();
-  setAcceptHoverEvents(true);
-}
-
-OSGViewport::~OSGViewport()
-{
-  if (m_window)
-  {
-    m_window->removeViewport(*this);
-  }
-}
-
-void OSGViewport::classBegin()
-{
-  setAcceptHoverEvents(true);
   setAcceptedMouseButtons(Qt::AllButtons);
+  setAcceptHoverEvents(true);
+  forceActiveFocus();
 
-  QQuickItem::classBegin();
+  m_viewer->setThreadingModel(osgViewer::ViewerBase::SingleThreaded);
+  m_viewer->setKeyEventSetsDone(0);
+  m_viewer->setReleaseContextAtEndOfFrameHint(false);
+
+  connect(&m_frameTimer, &QTimer::timeout, this, &QQuickFramebufferObject::update);
+
+  m_frameTimer.setInterval(s_FrameIntervalMs);
+  m_frameTimer.setSingleShot(false);
+
+  m_frameTimer.start();
 }
 
-void OSGViewport::acceptWindow(IWindow* window)
-{
-  m_window = window;
+OSGViewport::~OSGViewport() = default;
 
-  updateViewport();
-  setFlag(ItemHasContents, true);
+QPointer<IQmlGameProxy> OSGViewport::proxy() const
+{
+  return m_proxy;
 }
 
-void OSGViewport::prepareNode()
+void OSGViewport::setProxy(const QPointer<IQmlGameProxy>& proxy)
 {
-  if (!m_displayFbo && !m_needPrepareNodesUpdate)
+  m_proxy = proxy;
+
+  m_proxy->setViewportQuickItem(this);
+
+  auto view = m_proxy->getView();
+  view->getCamera(osgHelper::View::CameraType::Screen)->setGraphicsContext(m_window.get());
+  view->getCamera(osgHelper::View::CameraType::Scene)->setGraphicsContext(m_window.get());
+  view->getEventQueue()->setGraphicsContext(m_window.get());
+
+  m_viewer->addView(view);
+}
+
+osg::ref_ptr<osgViewer::CompositeViewer> OSGViewport::getViewer() const
+{
+  return m_viewer;
+}
+
+osg::ref_ptr<osgViewer::GraphicsWindow> OSGViewport::getGraphicsWindow() const
+{
+  return m_window;
+}
+
+QSize OSGViewport::getSize() const
+{
+  return QSize(static_cast<int>(width()), static_cast<int>(height()));
+}
+
+osg::ref_ptr<osgGA::EventQueue> OSGViewport::getPendingEvents() const
+{
+  return m_pendingEvents;
+}
+
+QQuickFramebufferObject::Renderer* OSGViewport::createRenderer() const
+{
+  return new RendererImpl(*this, m_proxy);
+}
+
+QSGNode* OSGViewport::updatePaintNode(QSGNode* oldNode, UpdatePaintNodeData* upnData)
+{
+  const auto node = QQuickFramebufferObject::updatePaintNode(oldNode, upnData);
+  auto textureNode = dynamic_cast<QSGSimpleTextureNode*>(node);
+  if (textureNode)
   {
-    return;
+    textureNode->setTextureCoordinatesTransform(QSGSimpleTextureNode::MirrorVertically);
   }
-
-  if(m_needPrepareNodesUpdate)
-  {
-    if (m_displayTexture)
-    {
-      delete m_displayTexture.data();
-    }
-
-    const auto textureHandle = m_displayFbo->texture();
-    m_displayTexture = m_window->getQuickWindow()->createTextureFromNativeObject(
-      QQuickWindow::NativeObjectTexture, &textureHandle, 0, m_renderSize);
-
-    if(!m_textureNode)
-    {
-      m_textureNode = new QSGSimpleTextureNode();
-      QMetaObject::invokeMethod(this, &QQuickItem::update, Qt::QueuedConnection);
-    }
-    m_textureNode->setRect(0, height(), width(), -height());
-
-    m_needPrepareNodesUpdate = false;
-  }
-
-  m_textureNode->setTexture(m_displayTexture);
-}
-
-void OSGViewport::deleteFrameBufferObjects()
-{
-  m_renderFbo.reset();
-  m_displayFbo.reset();
-}
-
-osg::ref_ptr<osgViewer::View> OSGViewport::getView() const
-{
-  return m_renderer->getView();
-}
-
-QPointer<IRenderer> OSGViewport::renderer() const
-{
-  return m_renderer;
-}
-
-void OSGViewport::setRenderer(const QPointer<IRenderer>& renderer)
-{
-  if (m_renderer)
-  {
-    UTILS_LOG_WARN("Unable to reset renderer");
-  }
-
-  m_renderer = renderer;
-  m_renderer->setContextWindow(m_window);
-  m_renderer->setViewportItem(this);
-
-  const auto preDrawCallback = new DrawCallbackFunc(std::bind(&OSGViewport::preDrawFunction, this));
-  const auto postDrawCallback = new DrawCallbackFunc(std::bind(&OSGViewport::postDrawFunction, this));
-
-  auto view = m_renderer->getView();
-  auto* ea = view->getEventQueue()->getCurrentEventState();
-  ea->setMouseYOrientation(osgGA::GUIEventAdapter::Y_INCREASING_UPWARDS);
-
-  view->getCamera(osgHelper::View::CameraType::Screen)->setPreDrawCallback(preDrawCallback);
-  view->getCamera(osgHelper::View::CameraType::Screen)->setPostDrawCallback(postDrawCallback);
-  view->getCamera(osgHelper::View::CameraType::Screen)->setGraphicsContext(m_context);
-  view->getCamera(osgHelper::View::CameraType::Scene)->setGraphicsContext(m_context);
-  view->getEventQueue()->setGraphicsContext(m_context);
-
-  m_window->addViewport(*this);
-}
-
-QSGNode* OSGViewport::updatePaintNode(
-  QSGNode* oldNode,
-  QQuickItem::UpdatePaintNodeData* updatePaintNodeData)
-{
-  if (oldNode && oldNode != m_textureNode)
-  {
-    qDebug() << "[osgQtQuick] ViewQtQuick::updatePaintNode delete old node " << oldNode;
-    delete oldNode;
-  }
-
-  if (m_window->initializeRenderContextIfNecessary())
-  {
-    return nullptr;
-  }
-
-  return m_textureNode;
+  return node;
 }
 
 void OSGViewport::geometryChanged(const QRectF& newGeometry, const QRectF& oldGeometry)
 {
-  const auto size = boundingRect().size().toSize();
-
-  updateViewport();
-
-  if(!m_textureNode)
-  {
-    m_renderSize = size;
-  }
-
-  QQuickItem::geometryChanged(newGeometry, oldGeometry);
+  m_pendingEvents->windowResize(newGeometry.x(), newGeometry.y(), newGeometry.width(), newGeometry.height());
+  QQuickFramebufferObject::geometryChanged(newGeometry, oldGeometry);
 }
 
-void OSGViewport::itemChange(QQuickItem::ItemChange change, const QQuickItem::ItemChangeData& value)
+void OSGViewport::itemChange(ItemChange change, const ItemChangeData& value)
 {
-  if(change == QQuickItem::ItemSceneChange && value.window)
+  if (change == ItemSceneChange && value.window)
   {
-    acceptWindow(Window::fromQuickWindow(value.window));
+    WindowsStorage::get().addQuickWindow(value.window);
   }
   QQuickItem::itemChange(change, value);
 }
 
 void OSGViewport::mousePressEvent(QMouseEvent* event)
 {
+  // intentionally not calling base implementation
+  m_pendingEvents->mouseButtonPress(
+    static_cast<float>(event->x()),
+    static_cast<float>(event->y()), 
+    qtToOsgMouseButton(*event));
 }
 
-void OSGViewport::preDrawFunction()
+void OSGViewport::mouseMoveEvent(QMouseEvent* event)
 {
-  if(m_remainingSizeUpdateSteps > 0)
-  {
-    m_renderFbo = std::make_unique<QOpenGLFramebufferObject>(m_renderSize, m_format);
-
-    --m_remainingSizeUpdateSteps;
-    m_needPrepareNodesUpdate = true;
-  }
-  m_renderFbo->bind();
+  QQuickFramebufferObject::mouseMoveEvent(event);
+  m_pendingEvents->mouseMotion(static_cast<float>(event->x()), static_cast<float>(event->y()));
 }
 
-void OSGViewport::postDrawFunction()
+void OSGViewport::mouseReleaseEvent(QMouseEvent* event)
 {
-  if (!m_renderFbo || !m_window)
-  {
-    return;
-  }
-
-  m_window->flush();
-  m_renderFbo->bindDefault();
-
-  std::swap(m_renderFbo, m_displayFbo);
-  std::swap(m_renderTexture, m_displayTexture);
+  QQuickFramebufferObject::mouseReleaseEvent(event);
+  m_pendingEvents->mouseButtonRelease(
+    static_cast<float>(event->x()),
+    static_cast<float>(event->y()),
+    qtToOsgMouseButton(*event));
 }
 
-void OSGViewport::updateViewport()
+void OSGViewport::mouseDoubleClickEvent(QMouseEvent* event)
 {
-  const auto size = boundingRect().size().toSize();
-  if (m_textureNode)
+  QQuickFramebufferObject::mouseDoubleClickEvent(event);
+  m_pendingEvents->mouseDoubleButtonPress(
+    static_cast<float>(event->x()),
+    static_cast<float>(event->y()),
+    qtToOsgMouseButton(*event));
+}
+
+void OSGViewport::wheelEvent(QWheelEvent* event)
+{
+  QQuickFramebufferObject::wheelEvent(event);
+  if (event->angleDelta().y() > 0)
   {
-    if (m_renderSize != size)
-    {
-      m_renderSize = size;
-      m_window->dispatchRenderThread([this, size]()
-      {
-        m_renderer->getView()->updateResolution(osg::Vec2i(size.width(), size.height()));
-        m_remainingSizeUpdateSteps = m_remainingSizeUpdateSteps % 2 + 2;
-      });
-    }
+    m_pendingEvents->mouseScroll(osgGA::GUIEventAdapter::SCROLL_UP);
   }
-  else if (m_renderer)
+  else
   {
-    m_renderer->getView()->updateResolution(osg::Vec2i(size.width(), size.height()));
+    m_pendingEvents->mouseScroll(osgGA::GUIEventAdapter::SCROLL_DOWN);
+  }
+}
+
+void OSGViewport::keyPressEvent(QKeyEvent* event)
+{
+  QQuickFramebufferObject::keyPressEvent(event);
+  const std::string text = event->text().toStdString();
+  if (text.size() == 1)
+  {
+    m_pendingEvents->keyPress(text[0]);
   }
 }
 

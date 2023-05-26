@@ -63,6 +63,7 @@ private Q_SLOTS:
 private:
   static const char* s_qmlUri;
   static const char* s_contextName;
+  static const char* s_viewportName;
   static const int s_majorVersion;
   static const int s_minorVersion;
 

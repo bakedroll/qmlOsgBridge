@@ -16,7 +16,7 @@ Window {
 
     OSGViewport {
         anchors.fill: parent
-        renderer: Context.renderer
+        proxy: Context.proxy
 
         Button {
             x: 50

@@ -1,21 +1,21 @@
 #include "MainContext.h"
 
-#include <qmlOsgBridge/DefaultRenderer.h>
+#include <qmlOsgBridge/DefaultQmlGameProxy.h>
 
 #include <osgHelper/ppu/HDR.h>
 
 MainContext::MainContext(osgHelper::ioc::Injector& injector) :
   IQmlContext(),
-  m_renderer(std::make_unique<qmlOsgBridge::DefaultRenderer>()),
+  m_proxy(std::make_unique<qmlOsgBridge::DefaultQmlGameProxy>()),
   m_isFullscreen(false)
 {
 }
 
 MainContext::~MainContext() = default;
 
-QPointer<qmlOsgBridge::IRenderer> MainContext::getMainRenderer() const
+QPointer<qmlOsgBridge::IQmlGameProxy> MainContext::getQmlGameProxy() const
 {
-  return m_renderer.get();
+  return m_proxy.get();
 }
 
 void MainContext::onGameStateAction(const osg::ref_ptr<libQtGame::AbstractGameState>& state, ActionType type)
@@ -24,9 +24,9 @@ void MainContext::onGameStateAction(const osg::ref_ptr<libQtGame::AbstractGameSt
 
 void MainContext::onToggleHDR()
 {
-  m_renderer->dispatchRenderThread([this]()
+  m_proxy->executeMutexLocked([this]()
   {
-    const auto view = m_renderer->getView();
+    const auto view = m_proxy->getView();
     const auto isEnabled = view->getPostProcessingEffectEnabled(osgHelper::ppu::HDR::Name);
     view->setPostProcessingEffectEnabled(osgHelper::ppu::HDR::Name, !isEnabled);
   });

@@ -1,76 +1,60 @@
 #pragma once
 
+#include <QQuickFramebufferObject>
+
+#include <QTimer>
+
 #include <qmlOsgBridge/IOSGViewport.h>
-
-#include <QOpenGLFramebufferObject>
-#include <QOpenGLFramebufferObjectFormat>
-#include <QPointer>
-#include <QQuickItem>
-#include <QSGSimpleTextureNode>
-#include <QSGTexture>
-
-#include <osgHelper/View.h>
-
-#include <memory>
+#include <qmlOsgBridge/IQmlGameProxy.h>
 
 namespace qmlOsgBridge
 {
 
-class IRenderer;
-class IWindow;
-
-class OSGViewport : public QQuickItem,
+class OSGViewport : public QQuickFramebufferObject,
                     public IOSGViewport
 {
   Q_OBJECT
 
-  Q_PROPERTY(QPointer<IRenderer> renderer READ renderer WRITE setRenderer REQUIRED)
+  Q_PROPERTY(QPointer<IQmlGameProxy> proxy READ proxy WRITE setProxy NOTIFY changedProxy)
 
 public:
-  explicit OSGViewport(QQuickItem* parent = nullptr);
+  OSGViewport(QQuickItem* parent = nullptr);
   ~OSGViewport() override;
 
-  void classBegin() override;
-  void acceptWindow(IWindow* window);
+  QPointer<IQmlGameProxy> proxy() const;
+  void setProxy(const QPointer<IQmlGameProxy>& proxy);
 
-  void prepareNode() override;
-  void deleteFrameBufferObjects() override;
+  osg::ref_ptr<osgViewer::CompositeViewer> getViewer() const override;
+  osg::ref_ptr<osgViewer::GraphicsWindow> getGraphicsWindow() const override;
 
-  osg::ref_ptr<osgViewer::View> getView() const override;
+  QSize getSize() const override;
+  osg::ref_ptr<osgGA::EventQueue> getPendingEvents() const override;
 
-  QPointer<IRenderer> renderer() const;
-  void setRenderer(const QPointer<IRenderer>& renderer);
+  Renderer* createRenderer() const override;
+
+Q_SIGNALS:
+  void changedProxy();
 
 protected:
-  QSGNode* updatePaintNode(QSGNode* oldNode, QQuickItem::UpdatePaintNodeData* updatePaintNodeData) override;
+  QSGNode* updatePaintNode(QSGNode* oldNode, UpdatePaintNodeData* upnData) override;
   void geometryChanged(const QRectF& newGeometry, const QRectF& oldGeometry) override;
-  void itemChange(QQuickItem::ItemChange change, const QQuickItem::ItemChangeData& value) override;
+  void itemChange(ItemChange change, const ItemChangeData& value) override;
 
   void mousePressEvent(QMouseEvent* event) override;
+  void mouseMoveEvent(QMouseEvent* event) override;
+  void mouseReleaseEvent(QMouseEvent* event) override;
+  void mouseDoubleClickEvent(QMouseEvent* event) override;
+  void wheelEvent(QWheelEvent*) override;
+  void keyPressEvent(QKeyEvent*) override;
 
 private:
-  IWindow* m_window;
-  QPointer<IRenderer> m_renderer;
+  osg::ref_ptr<osgViewer::CompositeViewer> m_viewer;
+  osg::ref_ptr<osgViewer::GraphicsWindow> m_window;
 
-  QOpenGLFramebufferObjectFormat m_format;
-  std::unique_ptr<QOpenGLFramebufferObject> m_renderFbo;
-  std::unique_ptr<QOpenGLFramebufferObject> m_displayFbo;
+  QPointer<IQmlGameProxy> m_proxy;
+  osg::ref_ptr<osgGA::EventQueue> m_pendingEvents;
 
-  QPointer<QSGTexture> m_renderTexture;
-  QPointer<QSGTexture> m_displayTexture;
-  QSGSimpleTextureNode* m_textureNode;
-
-  osg::ref_ptr<osgViewer::GraphicsWindowEmbedded> m_context;
-
-  int m_remainingSizeUpdateSteps;
-  QSize m_renderSize;
-
-  bool m_needPrepareNodesUpdate;
-
-  void preDrawFunction();
-  void postDrawFunction();
-
-  void updateViewport();
+  QTimer m_frameTimer;
 
 };
 

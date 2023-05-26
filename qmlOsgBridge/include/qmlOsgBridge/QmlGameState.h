@@ -2,16 +2,14 @@
 
 #include <libQtGame/AbstractGameState.h>
 
-#include <qmlOsgBridge/IRenderer.h>
-
 #include <libQtGame/KeyboardMouseEventFilter.h>
+
+#include <qmlOsgBridge/IQmlGameProxy.h>
 
 #include <memory>
 
 namespace qmlOsgBridge
 {
-
-class IRenderer;
 
 class QmlGameState : public libQtGame::AbstractGameState
 {
@@ -19,7 +17,7 @@ public:
   QmlGameState(osgHelper::ioc::Injector& injector);
   ~QmlGameState() override;
 
-  virtual void onInitialize(const QPointer<IRenderer>& renderer, const SimulationData& data);
+  virtual void onInitialize(const QPointer<IQmlGameProxy>& proxy, const SimulationData& data);
 
   bool isEventHandlingEnabled() const;
   libQtGame::KeyboardMouseEventFilter& eventHandler() const;

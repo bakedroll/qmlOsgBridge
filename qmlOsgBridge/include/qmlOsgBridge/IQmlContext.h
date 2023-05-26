@@ -10,14 +10,14 @@
 namespace qmlOsgBridge
 {
 
-class IRenderer;
+class IQmlGameProxy;
 
 class IQmlContext : public QObject,
                     public osg::Referenced
 {
   Q_OBJECT
 
-  Q_PROPERTY(QPointer<IRenderer> renderer READ getMainRenderer CONSTANT)
+  Q_PROPERTY(QPointer<IQmlGameProxy> proxy READ getQmlGameProxy CONSTANT)
 
 public:
   enum class ActionType
@@ -29,7 +29,7 @@ public:
   IQmlContext() = default;
   ~IQmlContext() override = default;
 
-  virtual QPointer<IRenderer> getMainRenderer() const = 0;
+  virtual QPointer<IQmlGameProxy> getQmlGameProxy() const = 0;
 
   virtual void onGameStateAction(
     const osg::ref_ptr<libQtGame::AbstractGameState>& state, ActionType type) = 0;

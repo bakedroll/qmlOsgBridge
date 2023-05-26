@@ -1,8 +1,12 @@
 #include "MainState.h"
 
+#include <QPointer>
+
 #include <osg/ShapeDrawable>
 
 #include <osgHelper/LightingNode.h>
+
+#include <qmlOsgBridge/IQmlGameProxy.h>
 
 MainState::MainState(osgHelper::ioc::Injector& injector) :
   QmlGameState(injector),
@@ -13,9 +17,9 @@ MainState::MainState(osgHelper::ioc::Injector& injector) :
 
 MainState::~MainState() = default;
 
-void MainState::onInitialize(const QPointer<qmlOsgBridge::IRenderer>& renderer, const SimulationData& data)
+void MainState::onInitialize(const QPointer<qmlOsgBridge::IQmlGameProxy>& proxy, const SimulationData& data)
 {
-  const auto view = renderer->getView();
+  const auto view = proxy->getView();
 
   auto camera = view->getCamera(osgHelper::View::CameraType::Scene);
   camera->setPosition(osg::Vec3f(0, -5, 0));

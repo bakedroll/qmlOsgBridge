@@ -14,7 +14,7 @@ public:
   explicit MainState(osgHelper::ioc::Injector& injector);
   ~MainState() override;
 
-  void onInitialize(const QPointer<qmlOsgBridge::IRenderer>& renderer, const SimulationData& data) override;
+  void onInitialize(const QPointer<qmlOsgBridge::IQmlGameProxy>& proxy, const SimulationData& data) override;
   void onUpdate(const SimulationData& data) override;
 
 protected:

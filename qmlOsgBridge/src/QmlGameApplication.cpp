@@ -1,19 +1,18 @@
 #include <qmlOsgBridge/QmlGameApplication.h>
 #include <qmlOsgBridge/QmlGameState.h>
 
-#include <QtUtilsLib/Multithreading.h>
-
 #include <qmlOsgBridge/IQmlContext.h>
+#include <qmlOsgBridge/IQmlGameProxy.h>
 #include <qmlOsgBridge/OSGViewport.h>
-#include <qmlOsgBridge/IRenderer.h>
 
-#include "Window.h"
+#include "WindowsStorage.h"
 
 namespace qmlOsgBridge
 {
 
 const char* QmlGameApplication::s_qmlUri = "qmlOsgBridge";
 const char* QmlGameApplication::s_contextName = "Context";
+const char* QmlGameApplication::s_viewportName = "OSGViewport";
 const int QmlGameApplication::s_majorVersion = 1;
 const int QmlGameApplication::s_minorVersion = 0;
 
@@ -21,8 +20,8 @@ QmlGameApplication::QmlGameApplication(int& argc, char** argv) :
   MultithreadedApplication<QGuiApplication>(argc, argv),
   GameStatesApplication()
 {
-  qmlRegisterType<qmlOsgBridge::OSGViewport>(s_qmlUri, s_majorVersion, s_minorVersion, "OSGViewport");
-  qRegisterMetaType<QPointer<IRenderer>>("QPointer<IRenderer>");
+  qmlRegisterType<OSGViewport>(s_qmlUri, s_majorVersion, s_minorVersion, s_viewportName);
+  qRegisterMetaType<QPointer<IQmlGameProxy>>("QPointer<IQmlGameProxy>");
 
   connect(&m_qmlEngine, &QQmlEngine::warnings, this, &QmlGameApplication::receiveWarnings, Qt::DirectConnection);
 }
@@ -37,7 +36,7 @@ QmlGameApplication::~QmlGameApplication()
 
 void QmlGameApplication::onInitialize(const osg::ref_ptr<libQtGame::GameUpdateCallback>& updateCallback)
 {
-  m_qmlContext->getMainRenderer()->getView()->getSceneData()->addUpdateCallback(updateCallback);
+  m_qmlContext->getQmlGameProxy()->getView()->getSceneData()->addUpdateCallback(updateCallback);
 }
 
 void QmlGameApplication::onPrepareGameState(const osg::ref_ptr<libQtGame::AbstractGameState>& state,
@@ -48,13 +47,12 @@ void QmlGameApplication::onPrepareGameState(const osg::ref_ptr<libQtGame::Abstra
   auto* eventState = dynamic_cast<QmlGameState*>(state.get());
   if (eventState)
   {
-    m_qmlContext->getMainRenderer()->moveObjectToRenderThread(eventState);
     if (eventState->isEventHandlingEnabled())
     {
-      m_qmlContext->getMainRenderer()->getViewportItem()->installEventFilter(&eventState->eventHandler());
+      m_qmlContext->getQmlGameProxy()->getViewportQuickItem()->installEventFilter(&eventState->eventHandler());
     }
 
-    eventState->onInitialize(m_qmlContext->getMainRenderer(), simData);
+    eventState->onInitialize(m_qmlContext->getQmlGameProxy(), simData);
   }
 }
 
@@ -63,7 +61,7 @@ void QmlGameApplication::onExitGameState(const osg::ref_ptr<libQtGame::AbstractG
   auto* eventState = dynamic_cast<QmlGameState*>(state.get());
   if (eventState && eventState->isEventHandlingEnabled())
   {
-    m_qmlContext->getMainRenderer()->getViewportItem()->removeEventFilter(&eventState->eventHandler());
+    m_qmlContext->getQmlGameProxy()->getViewportQuickItem()->removeEventFilter(&eventState->eventHandler());
   }
 
   m_qmlContext->onGameStateAction(state, IQmlContext::ActionType::Exit);
@@ -73,13 +71,13 @@ void QmlGameApplication::onEmptyStateList()
 {
   QtUtilsLib::Multithreading::executeInUiAsync([]()
   {
-    Window::closeAll();
+    WindowsStorage::get().closeAll();
   });
 }
 
 void QmlGameApplication::onShutdown()
 {
-  m_qmlContext->getMainRenderer()->getView()->cleanUp();
+  m_qmlContext->getQmlGameProxy()->getView()->cleanUp();
 }
 
 int QmlGameApplication::execApp()

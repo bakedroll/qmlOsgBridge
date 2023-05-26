@@ -1,9 +1,9 @@
 #pragma once
 
-#include <osgViewer/View>
+#include <QSize>
 
-#include <QObject>
-#include <QPointer>
+#include <osgGA/EventQueue>
+#include <osgViewer/CompositeViewer>
 
 namespace qmlOsgBridge
 {
@@ -11,12 +11,14 @@ namespace qmlOsgBridge
 class IOSGViewport
 {
 public:
+  IOSGViewport() = default;
   virtual ~IOSGViewport() = default;
 
-  virtual void prepareNode() = 0;
-  virtual void deleteFrameBufferObjects() = 0;
+  virtual osg::ref_ptr<osgViewer::CompositeViewer> getViewer() const = 0;
+  virtual osg::ref_ptr<osgViewer::GraphicsWindow> getGraphicsWindow() const = 0;
 
-  virtual osg::ref_ptr<osgViewer::View> getView() const = 0;
+  virtual QSize getSize() const = 0;
+  virtual osg::ref_ptr<osgGA::EventQueue> getPendingEvents() const = 0;
 
 };
 
