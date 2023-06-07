@@ -130,6 +130,8 @@ void OSGViewport::mousePressEvent(QMouseEvent* event)
     static_cast<float>(event->x()),
     static_cast<float>(event->y()), 
     qtToOsgMouseButton(*event));
+
+  forceActiveFocus();
 }
 
 void OSGViewport::mouseMoveEvent(QMouseEvent* event)
