@@ -20,10 +20,16 @@ public:
 
   void setViewportQuickItem(const QPointer<QQuickItem>& item) override;
 
+  void setRenderThread(const QPointer<QThread>& renderThread) override;
+  QPointer<QThread> getRenderThread() const override;
+
   void executeMutexLocked(const std::function<void()>& func) override;
 
 private:
   osg::ref_ptr<osgHelper::View> m_view;
+  QPointer<QThread> m_renderThread;
+
+  // TODO: remove
   QMutex m_mutex;
 
   QPointer<QQuickItem> m_quickItem;

@@ -23,6 +23,8 @@ private:
   const IOSGViewport& m_viewport;
   QPointer<IQmlGameProxy> m_proxy;
 
+  bool m_isRenderThreadPropagated;
+
   bool sizeHasChanged() const;
   void updateSize();
 

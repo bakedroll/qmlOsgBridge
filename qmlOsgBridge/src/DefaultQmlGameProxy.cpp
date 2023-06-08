@@ -26,6 +26,17 @@ void DefaultQmlGameProxy::setViewportQuickItem(const QPointer<QQuickItem>& item)
   m_quickItem = item;
 }
 
+void DefaultQmlGameProxy::setRenderThread(const QPointer<QThread>& renderThread)
+{
+  m_renderThread = renderThread;
+  Q_EMIT renderThreadPropagated(m_renderThread);
+}
+
+QPointer<QThread> DefaultQmlGameProxy::getRenderThread() const
+{
+  return m_renderThread;
+}
+
 void DefaultQmlGameProxy::executeMutexLocked(const std::function<void()>& func)
 {
   QMutexLocker locker(&m_mutex);

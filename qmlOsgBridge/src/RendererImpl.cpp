@@ -11,7 +11,8 @@ namespace qmlOsgBridge
 
 RendererImpl::RendererImpl(const IOSGViewport& viewport, const QPointer<IQmlGameProxy>& proxy) :
   m_viewport(viewport),
-  m_proxy(proxy)
+  m_proxy(proxy),
+  m_isRenderThreadPropagated(false)
 {
   updateSize();
 }
@@ -20,6 +21,12 @@ RendererImpl::~RendererImpl() = default;
 
 void RendererImpl::synchronize(QQuickFramebufferObject* item)
 {
+  if (!m_isRenderThreadPropagated)
+  {
+    m_proxy->setRenderThread(QThread::currentThread());
+    m_isRenderThreadPropagated = true;
+  }
+
   osgGA::EventQueue::Events events;
   m_viewport.getPendingEvents()->takeEvents(events);
   m_proxy->getView()->getEventQueue()->appendEvents(events);

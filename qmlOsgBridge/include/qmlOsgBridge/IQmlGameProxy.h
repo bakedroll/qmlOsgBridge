@@ -2,8 +2,8 @@
 
 #include <functional>
 
-#include <QObject>
 #include <QQuickItem>
+#include <QThread>
 
 #include <osgHelper/View.h>
 
@@ -23,7 +23,13 @@ public:
 
   virtual void setViewportQuickItem(const QPointer<QQuickItem>& item) = 0;
 
+  virtual void setRenderThread(const QPointer<QThread>& renderThread) = 0;
+  virtual QPointer<QThread> getRenderThread() const = 0;
+
   virtual void executeMutexLocked(const std::function<void()>& func) = 0;
+
+Q_SIGNALS:
+  void renderThreadPropagated(QThread* renderThread);
 
 };
 
