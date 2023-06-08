@@ -47,12 +47,13 @@ void QmlGameApplication::onPrepareGameState(const osg::ref_ptr<libQtGame::Abstra
   auto* eventState = dynamic_cast<QmlGameState*>(state.get());
   if (eventState)
   {
+    const auto proxy = m_qmlContext->getQmlGameProxy();
     if (eventState->isEventHandlingEnabled())
     {
-      m_qmlContext->getQmlGameProxy()->getViewportQuickItem()->installEventFilter(&eventState->eventHandler());
+      proxy->getViewportQuickItem()->installEventFilter(&eventState->eventHandler());
     }
 
-    eventState->onInitialize(m_qmlContext->getQmlGameProxy(), simData);
+    eventState->onInitialize(proxy, simData);
   }
 }
 

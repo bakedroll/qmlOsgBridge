@@ -58,7 +58,7 @@ bool MainState::onKeyEvent(QKeyEvent* event)
 {
   if (event->key() == Qt::Key_Escape)
   {
-    requestExitEventState();
+    requestExitEventState(ExitGameStateMode::ExitAll);
     return true;
   }
   return false;

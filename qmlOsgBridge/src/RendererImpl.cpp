@@ -11,8 +11,7 @@ namespace qmlOsgBridge
 
 RendererImpl::RendererImpl(const IOSGViewport& viewport, const QPointer<IQmlGameProxy>& proxy) :
   m_viewport(viewport),
-  m_proxy(proxy),
-  m_isDefaultFboSet(false)
+  m_proxy(proxy)
 {
   updateSize();
 }
@@ -30,12 +29,6 @@ void RendererImpl::render()
 {
   m_proxy->executeMutexLocked([this]()
   {
-    if (!m_isDefaultFboSet)
-    {
-      m_viewport.getGraphicsWindow()->setDefaultFboId(framebufferObject()->handle());
-      m_isDefaultFboSet = true;
-    }
-
     QOpenGLContext::currentContext()->functions()->glUseProgram(0);
     if (sizeHasChanged())
     {
@@ -48,7 +41,9 @@ void RendererImpl::render()
 
 QOpenGLFramebufferObject* RendererImpl::createFramebufferObject(const QSize& size)
 {
-  return new QOpenGLFramebufferObject(size, QOpenGLFramebufferObjectFormat());
+  const auto fbo = new QOpenGLFramebufferObject(size, QOpenGLFramebufferObjectFormat());
+  m_viewport.getGraphicsWindow()->setDefaultFboId(fbo->handle());
+  return fbo;
 }
 
 bool RendererImpl::sizeHasChanged() const
