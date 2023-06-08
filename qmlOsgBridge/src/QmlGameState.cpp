@@ -64,17 +64,17 @@ void QmlGameState::enableEventHandling()
   m_eventHandler = std::make_unique<libQtGame::KeyboardMouseEventFilter>();
 
   connect(m_eventHandler.get(), &libQtGame::KeyboardMouseEventFilter::triggerKeyEvent,
-    this, &QmlGameState::forwardKeyEvent, Qt::DirectConnection);
+    this, &QmlGameState::forwardKeyEvent, Qt::BlockingQueuedConnection);
   connect(m_eventHandler.get(), &libQtGame::KeyboardMouseEventFilter::triggerMouseEvent,
-    this, &QmlGameState::forwardMouseEvent, Qt::DirectConnection);
+    this, &QmlGameState::forwardMouseEvent, Qt::BlockingQueuedConnection);
   connect(m_eventHandler.get(), &libQtGame::KeyboardMouseEventFilter::triggerWheelEvent,
-    this, &QmlGameState::forwardWheelEvent, Qt::DirectConnection);
+    this, &QmlGameState::forwardWheelEvent, Qt::BlockingQueuedConnection);
   connect(m_eventHandler.get(), &libQtGame::KeyboardMouseEventFilter::triggerDragBegin,
-    this, &QmlGameState::forwardDragBegin, Qt::DirectConnection);
+    this, &QmlGameState::forwardDragBegin, Qt::BlockingQueuedConnection);
   connect(m_eventHandler.get(), &libQtGame::KeyboardMouseEventFilter::triggerDragMove,
-    this, &QmlGameState::forwardDragMove, Qt::DirectConnection);
+    this, &QmlGameState::forwardDragMove, Qt::BlockingQueuedConnection);
   connect(m_eventHandler.get(), &libQtGame::KeyboardMouseEventFilter::triggerDragEnd,
-    this, &QmlGameState::forwardDragEnd, Qt::DirectConnection);
+    this, &QmlGameState::forwardDragEnd, Qt::BlockingQueuedConnection);
 }
 
 void QmlGameState::forwardKeyEvent(QKeyEvent* event, bool& accepted)

@@ -11,6 +11,7 @@ namespace qmlOsgBridge
 {
 
 class IQmlContext;
+class QmlGameState;
 
 class QmlGameApplication : public QtUtilsLib::MultithreadedApplication<QGuiApplication>,
                            public libQtGame::GameStatesApplication
@@ -59,6 +60,7 @@ protected:
 
 private Q_SLOTS:
   void receiveWarnings(const QList<QQmlError>& warnings);
+  void onRenderThreadPropagated(QThread* renderThread);
 
 private:
   static const char* s_qmlUri;
@@ -86,6 +88,7 @@ private:
   }
 
   void addQmlImportPaths();
+  void prepareStateEventHandling(const osg::ref_ptr<QmlGameState>& state, const QPointer<QThread>& renderThread);
 
 };
 

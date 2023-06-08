@@ -36,7 +36,10 @@ QmlGameApplication::~QmlGameApplication()
 
 void QmlGameApplication::onInitialize(const osg::ref_ptr<libQtGame::GameUpdateCallback>& updateCallback)
 {
-  m_qmlContext->getQmlGameProxy()->getView()->getSceneData()->addUpdateCallback(updateCallback);
+  const auto proxy = m_qmlContext->getQmlGameProxy();
+  connect(proxy, &IQmlGameProxy::renderThreadPropagated, this, &QmlGameApplication::onRenderThreadPropagated,
+    Qt::QueuedConnection);
+  proxy->getView()->getSceneData()->addUpdateCallback(updateCallback);
 }
 
 void QmlGameApplication::onPrepareGameState(const osg::ref_ptr<libQtGame::AbstractGameState>& state,
@@ -48,9 +51,10 @@ void QmlGameApplication::onPrepareGameState(const osg::ref_ptr<libQtGame::Abstra
   if (eventState)
   {
     const auto proxy = m_qmlContext->getQmlGameProxy();
-    if (eventState->isEventHandlingEnabled())
+    const auto renderThread = proxy->getRenderThread();
+    if (renderThread)
     {
-      proxy->getViewportQuickItem()->installEventFilter(&eventState->eventHandler());
+      prepareStateEventHandling(eventState, renderThread);
     }
 
     eventState->onInitialize(proxy, simData);
@@ -111,12 +115,35 @@ void QmlGameApplication::receiveWarnings(const QList<QQmlError>& warnings)
   m_warnings = warnings;
 }
 
+void QmlGameApplication::onRenderThreadPropagated(QThread* renderThread)
+{
+  QMutexLocker locker(&statesMutex());
+  auto states = getGameStates();
+  for (auto state : states)
+  {
+    auto* eventState = dynamic_cast<QmlGameState*>(state.get());
+    if (eventState)
+    {
+      prepareStateEventHandling(eventState, renderThread);
+    }
+  }
+}
+
 void QmlGameApplication::addQmlImportPaths()
 {
   const auto paths = qmlImportPaths();
   for (const auto& path: paths)
   {
     m_qmlEngine.addImportPath(path);
+  }
+}
+
+void QmlGameApplication::prepareStateEventHandling(const osg::ref_ptr<QmlGameState>& state, const QPointer<QThread>& renderThread)
+{
+  if (state->isEventHandlingEnabled())
+  {
+    state->moveToThread(renderThread);
+    m_qmlContext->getQmlGameProxy()->getViewportQuickItem()->installEventFilter(&state->eventHandler());
   }
 }
 
