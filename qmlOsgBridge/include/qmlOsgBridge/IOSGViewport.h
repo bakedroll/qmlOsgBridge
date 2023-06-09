@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QQuickWindow>
 #include <QSize>
 
 #include <osgGA/EventQueue>
@@ -16,6 +17,7 @@ public:
 
   virtual osg::ref_ptr<osgViewer::CompositeViewer> getViewer() const = 0;
   virtual osg::ref_ptr<osgViewer::GraphicsWindow> getGraphicsWindow() const = 0;
+  virtual QPointer<QQuickWindow> getQuickWindow() const = 0;
 
   virtual QSize getSize() const = 0;
   virtual osg::ref_ptr<osgGA::EventQueue> getPendingEvents() const = 0;

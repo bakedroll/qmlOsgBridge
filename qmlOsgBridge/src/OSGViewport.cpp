@@ -82,6 +82,11 @@ osg::ref_ptr<osgViewer::GraphicsWindow> OSGViewport::getGraphicsWindow() const
   return m_window;
 }
 
+QPointer<QQuickWindow> OSGViewport::getQuickWindow() const
+{
+  return m_quickWindow;
+}
+
 QSize OSGViewport::getSize() const
 {
   return QSize(static_cast<int>(width()), static_cast<int>(height()));
@@ -118,6 +123,7 @@ void OSGViewport::itemChange(ItemChange change, const ItemChangeData& value)
 {
   if (change == ItemSceneChange && value.window)
   {
+    m_quickWindow = value.window;
     WindowsStorage::get().addQuickWindow(value.window);
   }
   QQuickItem::itemChange(change, value);

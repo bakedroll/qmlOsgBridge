@@ -26,6 +26,7 @@ public:
 
   osg::ref_ptr<osgViewer::CompositeViewer> getViewer() const override;
   osg::ref_ptr<osgViewer::GraphicsWindow> getGraphicsWindow() const override;
+  QPointer<QQuickWindow> getQuickWindow() const override;
 
   QSize getSize() const override;
   osg::ref_ptr<osgGA::EventQueue> getPendingEvents() const override;
@@ -50,6 +51,7 @@ protected:
 private:
   osg::ref_ptr<osgViewer::CompositeViewer> m_viewer;
   osg::ref_ptr<osgViewer::GraphicsWindow> m_window;
+  QPointer<QQuickWindow> m_quickWindow;
 
   QPointer<IQmlGameProxy> m_proxy;
   osg::ref_ptr<osgGA::EventQueue> m_pendingEvents;

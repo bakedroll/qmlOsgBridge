@@ -1,6 +1,5 @@
 #include "RendererImpl.h"
 
-#include <QOpenGLContext>
 #include <QOpenGLFramebufferObject>
 #include <QOpenGLFunctions>
 
@@ -29,7 +28,7 @@ void RendererImpl::render()
 {
   m_proxy->executeMutexLocked([this]()
   {
-    QOpenGLContext::currentContext()->functions()->glUseProgram(0);
+    m_viewport.getQuickWindow()->resetOpenGLState();
     if (sizeHasChanged())
     {
       updateSize();
