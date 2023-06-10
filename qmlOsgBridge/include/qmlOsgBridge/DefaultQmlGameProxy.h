@@ -1,6 +1,6 @@
 #pragma once
 
-#include <QMutex>
+#include <QRecursiveMutex>
 
 #include <qmlOsgBridge/IQmlGameProxy.h>
 
@@ -24,7 +24,7 @@ public:
 
 private:
   osg::ref_ptr<osgHelper::View> m_view;
-  QMutex m_mutex;
+  QRecursiveMutex m_mutex;
 
   QPointer<QQuickItem> m_quickItem;
 
