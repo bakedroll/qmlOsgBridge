@@ -1,6 +1,7 @@
 #include <qmlOsgBridge/QmlGameApplication.h>
 #include <qmlOsgBridge/QmlGameState.h>
 
+#include <qmlOsgBridge/IQmlContext.h>
 #include <qmlOsgBridge/IQmlGameProxy.h>
 #include <qmlOsgBridge/OSGViewport.h>
 
