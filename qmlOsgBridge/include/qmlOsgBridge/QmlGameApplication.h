@@ -4,6 +4,8 @@
 
 #include <QtUtilsLib/MultithreadedApplication.h>
 
+#include <qmlOsgBridge/IQmlContext.h>
+
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 
@@ -33,7 +35,14 @@ public:
 
     addQmlImportPaths();
     m_qmlEngine.load(QUrl(rootQmlFilename));
-    if (!m_warnings.empty() || !injectPushAndPrepareState<TState>())
+    if (!m_warnings.empty())
+    {
+      return -1;
+    }
+
+    m_qmlContext->onCompleted();
+
+    if (!injectPushAndPrepareState<TState>())
     {
       return -1;
     }

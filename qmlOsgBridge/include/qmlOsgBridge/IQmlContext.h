@@ -30,6 +30,7 @@ public:
   ~IQmlContext() override = default;
 
   virtual QPointer<IQmlGameProxy> getQmlGameProxy() const = 0;
+  virtual void onCompleted() {}
 
   virtual void onGameStateAction(
     const osg::ref_ptr<libQtGame::AbstractGameState>& state, ActionType type) = 0;
