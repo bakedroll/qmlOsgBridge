@@ -11,7 +11,7 @@
 namespace qmlOsgBridge
 {
 
-static const int s_FrameIntervalMs = 16;
+static const int sc_defaultFrameIntervalMs = 16;
 
 static int qtToOsgMouseButton(const QMouseEvent& event)
 {
@@ -45,7 +45,7 @@ OSGViewport::OSGViewport(QQuickItem* parent) :
 
   connect(&m_frameTimer, &QTimer::timeout, this, &QQuickFramebufferObject::update);
 
-  m_frameTimer.setInterval(s_FrameIntervalMs);
+  m_frameTimer.setInterval(sc_defaultFrameIntervalMs);
   m_frameTimer.setSingleShot(false);
 
   m_frameTimer.start();
@@ -70,6 +70,17 @@ void OSGViewport::setProxy(const QPointer<IQmlGameProxy>& proxy)
   view->getEventQueue()->setGraphicsContext(m_window.get());
 
   m_viewer->addView(view);
+}
+
+int OSGViewport::frameTimeMs() const
+{
+  return m_frameTimer.interval();
+}
+
+void OSGViewport::setFrameTimeMs(int frameTimeMs)
+{
+  m_frameTimer.setInterval(frameTimeMs);
+  Q_EMIT changedFrameTimeMs();
 }
 
 osg::ref_ptr<osgViewer::CompositeViewer> OSGViewport::getViewer() const

@@ -16,6 +16,7 @@ class OSGViewport : public QQuickFramebufferObject,
   Q_OBJECT
 
   Q_PROPERTY(QPointer<IQmlGameProxy> proxy READ proxy WRITE setProxy NOTIFY changedProxy)
+  Q_PROPERTY(int frameTimeMs READ frameTimeMs WRITE setFrameTimeMs NOTIFY changedFrameTimeMs)
 
 public:
   OSGViewport(QQuickItem* parent = nullptr);
@@ -23,6 +24,9 @@ public:
 
   QPointer<IQmlGameProxy> proxy() const;
   void setProxy(const QPointer<IQmlGameProxy>& proxy);
+
+  int frameTimeMs() const;
+  void setFrameTimeMs(int frameTimeMs);
 
   osg::ref_ptr<osgViewer::CompositeViewer> getViewer() const override;
   osg::ref_ptr<osgViewer::GraphicsWindow> getGraphicsWindow() const override;
@@ -35,6 +39,7 @@ public:
 
 Q_SIGNALS:
   void changedProxy();
+  void changedFrameTimeMs();
 
 protected:
   QSGNode* updatePaintNode(QSGNode* oldNode, UpdatePaintNodeData* upnData) override;
