@@ -41,6 +41,8 @@ public:
     return GameStatesApplication::runGame();
   }
 
+  void disableVSync();
+
 protected:
   void onInitialize(const osg::ref_ptr<libQtGame::GameUpdateCallback>& updateCallback) override;
   void onPrepareGameState(

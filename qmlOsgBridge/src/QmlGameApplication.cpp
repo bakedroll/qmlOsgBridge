@@ -34,6 +34,13 @@ QmlGameApplication::~QmlGameApplication()
   }
 }
 
+void QmlGameApplication::disableVSync()
+{
+  auto format = QSurfaceFormat::defaultFormat();
+  format.setSwapInterval(0);
+  QSurfaceFormat::setDefaultFormat(format);
+}
+
 void QmlGameApplication::onInitialize(const osg::ref_ptr<libQtGame::GameUpdateCallback>& updateCallback)
 {
   m_qmlContext->getQmlGameProxy()->getView()->getSceneData()->addUpdateCallback(updateCallback);
