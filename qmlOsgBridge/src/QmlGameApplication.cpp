@@ -85,6 +85,7 @@ void QmlGameApplication::onEmptyStateList()
 
 void QmlGameApplication::onShutdown()
 {
+  m_qmlContext->onShutdown();
   m_qmlContext->getQmlGameProxy()->getView()->cleanUp();
 }
 

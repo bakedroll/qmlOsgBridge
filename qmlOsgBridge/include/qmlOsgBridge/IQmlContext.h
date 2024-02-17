@@ -34,6 +34,8 @@ public:
   virtual void onGameStateAction(
     const osg::ref_ptr<libQtGame::AbstractGameState>& state, ActionType type) = 0;
 
+  virtual void onShutdown() = 0;
+
 };
 
 }
