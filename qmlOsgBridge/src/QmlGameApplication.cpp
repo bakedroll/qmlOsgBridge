@@ -60,7 +60,10 @@ void QmlGameApplication::onPrepareGameState(const osg::ref_ptr<libQtGame::Abstra
       proxy->getViewportQuickItem()->installEventFilter(&eventState->eventHandler());
     }
 
-    eventState->onInitialize(proxy, simData);
+    proxy->executeMutexLocked([eventState, &proxy, &simData]()
+    {
+      eventState->onInitialize(proxy, simData);
+    });
   }
 }
 
