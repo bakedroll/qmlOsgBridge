@@ -54,16 +54,13 @@ void QmlGameApplication::onPrepareGameState(const osg::ref_ptr<libQtGame::Abstra
   auto* eventState = dynamic_cast<QmlGameState*>(state.get());
   if (eventState)
   {
+    m_qmlGameStates.emplace_back(eventState);
+
     const auto proxy = m_qmlContext->getQmlGameProxy();
     if (eventState->isEventHandlingEnabled())
     {
       proxy->getViewportQuickItem()->installEventFilter(&eventState->eventHandler());
     }
-
-    proxy->executeMutexLocked([eventState, &proxy, &simData]()
-    {
-      eventState->onInitialize(proxy, simData);
-    });
   }
 }
 
@@ -72,6 +69,15 @@ void QmlGameApplication::onExitGameState(const osg::ref_ptr<libQtGame::AbstractG
   auto* eventState = dynamic_cast<QmlGameState*>(state.get());
   if (eventState && eventState->isEventHandlingEnabled())
   {
+    for (auto it = m_qmlGameStates.begin(); it != m_qmlGameStates.end(); ++it)
+    {
+      if (it->get() == eventState)
+      {
+        m_qmlGameStates.erase(it);
+        break;
+      }
+    }
+
     m_qmlContext->getQmlGameProxy()->getViewportQuickItem()->removeEventFilter(&eventState->eventHandler());
   }
 
@@ -88,8 +94,21 @@ void QmlGameApplication::onEmptyStateList()
 
 void QmlGameApplication::onShutdown()
 {
+  m_qmlGameStates.clear();
   m_qmlContext->onShutdown();
   m_qmlContext->getQmlGameProxy()->getView()->cleanUp();
+}
+
+void QmlGameApplication::onPreStatesUpdate(const osgHelper::SimulationCallback::SimulationData& data)
+{
+  for (const auto& state : m_qmlGameStates)
+  {
+    if (!state->isInitialized())
+    {
+      state->onInitialize(m_qmlContext->getQmlGameProxy(), data);
+      state->setInitialized();
+    }
+  }
 }
 
 int QmlGameApplication::execApp()

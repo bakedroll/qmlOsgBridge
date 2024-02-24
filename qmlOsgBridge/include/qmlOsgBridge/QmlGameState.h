@@ -22,6 +22,9 @@ public:
   bool isEventHandlingEnabled() const;
   libQtGame::KeyboardMouseEventFilter& eventHandler() const;
 
+  void setInitialized();
+  bool isInitialized() const;
+
 protected:
   virtual bool onKeyEvent(QKeyEvent* event);
   virtual bool onMouseEvent(QMouseEvent* event);
@@ -45,6 +48,7 @@ private Q_SLOTS:
 
 private:
   std::unique_ptr<libQtGame::KeyboardMouseEventFilter> m_eventHandler;
+  bool m_isInitialized;
 
 };
 

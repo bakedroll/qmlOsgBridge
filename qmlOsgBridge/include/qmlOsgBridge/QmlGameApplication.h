@@ -11,6 +11,7 @@ namespace qmlOsgBridge
 {
 
 class IQmlContext;
+class QmlGameState;
 
 class QmlGameApplication : public QtUtilsLib::MultithreadedApplication<QGuiApplication>,
                            public libQtGame::GameStatesApplication
@@ -51,6 +52,7 @@ protected:
   void onExitGameState(const osg::ref_ptr<libQtGame::AbstractGameState>& state) override;
   void onEmptyStateList() override;
   void onShutdown() override;
+  void onPreStatesUpdate(const osgHelper::SimulationCallback::SimulationData& data) override;
 
   int execApp() override;
   void quitApp() override;
@@ -73,6 +75,8 @@ private:
   osg::ref_ptr<IQmlContext> m_qmlContext;
 
   QList<QQmlError> m_warnings;
+
+  std::vector<osg::ref_ptr<QmlGameState>> m_qmlGameStates;
 
   template <typename TContext>
   bool injectAndRegisterContext()
