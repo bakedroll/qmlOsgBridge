@@ -103,7 +103,7 @@ void QmlGameApplication::onPreStatesUpdate(const osgHelper::SimulationCallback::
 {
   for (const auto& state : m_qmlGameStates)
   {
-    if (!state->isInitialized())
+    if (!state->isInitialized() && !state->isExiting())
     {
       state->onInitialize(m_qmlContext->getQmlGameProxy(), data);
       state->setInitialized();
