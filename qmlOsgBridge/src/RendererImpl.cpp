@@ -1,7 +1,7 @@
-#include "RendererImpl.h"
-
 #include <QOpenGLFramebufferObject>
 #include <QOpenGLFunctions>
+
+#include "RendererImpl.h"
 
 #include <qmlOsgBridge/IOSGViewport.h>
 

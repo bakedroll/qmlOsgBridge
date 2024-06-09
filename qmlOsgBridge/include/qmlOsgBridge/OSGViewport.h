@@ -1,11 +1,10 @@
 #pragma once
 
-#include <QQuickFramebufferObject>
-
-#include <QTimer>
-
 #include <qmlOsgBridge/IOSGViewport.h>
 #include <qmlOsgBridge/IQmlGameProxy.h>
+
+#include <QQuickFramebufferObject>
+#include <QTimer>
 
 namespace qmlOsgBridge
 {

@@ -1,12 +1,12 @@
 #include <qmlOsgBridge/OSGViewport.h>
 
-#include <QSGSimpleTextureNode>
-#include <QTimer>
-
 #include <osgGA/EventQueue>
 
 #include "RendererImpl.h"
 #include "WindowsStorage.h"
+
+#include <QSGSimpleTextureNode>
+#include <QTimer>
 
 namespace qmlOsgBridge
 {

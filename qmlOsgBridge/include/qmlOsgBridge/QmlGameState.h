@@ -1,8 +1,8 @@
 #pragma once
 
-#include <libQtGame/AbstractGameState.h>
-
 #include <libQtGame/KeyboardMouseEventFilter.h>
+
+#include <libQtGame/AbstractGameState.h>
 
 #include <qmlOsgBridge/IQmlGameProxy.h>
 

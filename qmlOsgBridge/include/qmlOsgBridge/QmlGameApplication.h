@@ -1,11 +1,11 @@
 #pragma once
 
-#include <libQtGame/GameStatesApplication.h>
+#include <QGuiApplication>
+#include <QQmlApplicationEngine>
 
 #include <QtUtilsLib/MultithreadedApplication.h>
 
-#include <QGuiApplication>
-#include <QQmlApplicationEngine>
+#include <libQtGame/GameStatesApplication.h>
 
 namespace qmlOsgBridge
 {

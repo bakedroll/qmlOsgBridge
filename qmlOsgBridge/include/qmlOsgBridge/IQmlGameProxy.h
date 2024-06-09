@@ -1,9 +1,9 @@
 #pragma once
 
-#include <functional>
-
 #include <QObject>
 #include <QQuickItem>
+
+#include <functional>
 
 #include <osgHelper/View.h>
 
