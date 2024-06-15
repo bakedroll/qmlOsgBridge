@@ -5,7 +5,12 @@
 
 #include <functional>
 
-#include <osgHelper/View.h>
+#include <osg/ref_ptr>
+
+namespace osgHelper
+{
+class View;
+}
 
 namespace qmlOsgBridge
 {

@@ -1,11 +1,14 @@
 #include <qmlOsgBridge/QmlGameApplication.h>
-#include <qmlOsgBridge/QmlGameState.h>
-
-#include <qmlOsgBridge/IQmlContext.h>
-#include <qmlOsgBridge/IQmlGameProxy.h>
-#include <qmlOsgBridge/OSGViewport.h>
 
 #include "WindowsStorage.h"
+
+#include <qmlOsgBridge/IQmlContext.h>
+#include <qmlOsgBridge/OSGViewport.h>
+#include <qmlOsgBridge/QmlGameState.h>
+
+#include <qmlOsgBridge/IQmlGameProxy.h>
+
+#include <osgHelper/View.h>
 
 namespace qmlOsgBridge
 {

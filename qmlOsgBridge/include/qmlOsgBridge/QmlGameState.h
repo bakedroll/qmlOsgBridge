@@ -17,6 +17,7 @@ public:
   QmlGameState(osgHelper::ioc::Injector& injector);
   ~QmlGameState() override;
 
+  void onInitialize(const SimulationData& data) override;
   virtual void onInitialize(const QPointer<IQmlGameProxy>& proxy, const SimulationData& data);
 
   bool isEventHandlingEnabled() const;

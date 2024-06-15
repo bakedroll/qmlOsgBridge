@@ -5,6 +5,8 @@
 
 #include <qmlOsgBridge/IOSGViewport.h>
 
+#include <osgHelper/View.h>
+
 namespace qmlOsgBridge
 {
 

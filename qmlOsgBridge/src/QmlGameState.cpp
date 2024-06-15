@@ -11,6 +11,11 @@ QmlGameState::QmlGameState(osgHelper::ioc::Injector& injector) :
 
 QmlGameState::~QmlGameState() = default;
 
+void QmlGameState::onInitialize(const SimulationData& data)
+{
+  AbstractGameState::onInitialize(data);
+}
+
 void QmlGameState::onInitialize(const QPointer<IQmlGameProxy>& proxy, const SimulationData& data)
 {
 }

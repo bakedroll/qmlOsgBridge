@@ -1,5 +1,7 @@
 #include "qmlOsgBridge/DefaultQmlGameProxy.h"
 
+#include <osgHelper/View.h>
+
 namespace qmlOsgBridge
 {
 
